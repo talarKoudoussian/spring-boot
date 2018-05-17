@@ -1,14 +1,14 @@
-package com.sample;
+package models;
 
+import java.sql.Timestamp;
 
-public class SbEmployee {
+public class Employee {
 
   private long employeeId;
   private String firstName;
   private String lastName;
-  private java.sql.Timestamp addedDate;
+  private Timestamp addedDate;
   private long status;
-
 
   public long getEmployeeId() {
     return employeeId;
@@ -18,7 +18,6 @@ public class SbEmployee {
     this.employeeId = employeeId;
   }
 
-
   public String getFirstName() {
     return firstName;
   }
@@ -26,7 +25,6 @@ public class SbEmployee {
   public void setFirstName(String firstName) {
     this.firstName = firstName;
   }
-
 
   public String getLastName() {
     return lastName;
@@ -36,7 +34,6 @@ public class SbEmployee {
     this.lastName = lastName;
   }
 
-
   public java.sql.Timestamp getAddedDate() {
     return addedDate;
   }
@@ -45,7 +42,6 @@ public class SbEmployee {
     this.addedDate = addedDate;
   }
 
-
   public long getStatus() {
     return status;
   }
@@ -53,5 +49,4 @@ public class SbEmployee {
   public void setStatus(long status) {
     this.status = status;
   }
-
 }
