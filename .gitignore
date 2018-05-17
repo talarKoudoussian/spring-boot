@@ -1,4 +1,4 @@
-# IntelliJ IDE project files
+# IDE project files
 .idea/**/datasources.xml
 .idea/workspace.xml
 .idea/**/tasks.xml
@@ -15,6 +15,10 @@
 .idea/**/dbnavigator.xml
 *.iws
 out/
+.classpath
+.project
+.settings/
+bin/
 
 # Compiled class file
 *.class
