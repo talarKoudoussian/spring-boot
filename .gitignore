@@ -1,4 +1,20 @@
-.idea/
+# IntelliJ IDE project files
+.idea/**/datasources.xml
+.idea/workspace.xml
+.idea/**/tasks.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/gradle.xml
+.idea/**/libraries
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+*.iws
+out/
 
 # Compiled class file
 *.class
@@ -24,7 +40,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-.gradle
+.gradle/
 /build/
 
 # Ignore Gradle GUI config
