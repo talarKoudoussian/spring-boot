@@ -7,8 +7,8 @@ public class Employee {
   private long employeeId;
   private String firstName;
   private String lastName;
-  private Timestamp addedDate;
-  private long status;
+  private String addedDate;
+  private String employmentStatus;
 
   public long getEmployeeId() {
     return employeeId;
@@ -34,19 +34,23 @@ public class Employee {
     this.lastName = lastName;
   }
 
-  public java.sql.Timestamp getAddedDate() {
+  public String getAddedDate() {
     return addedDate;
   }
 
-  public void setAddedDate(java.sql.Timestamp addedDate) {
+  public void setAddedDate(String addedDate) {
     this.addedDate = addedDate;
   }
 
-  public long getStatus() {
-    return status;
+  public String getStatus() {
+    return employmentStatus;
   }
 
-  public void setStatus(long status) {
-    this.status = status;
+  public void setStatus(String employmentStatus) {
+    this.employmentStatus = employmentStatus;
+  }
+
+  public String toString(){
+    return "Employee[firstName: " + this.firstName + " lastName: " + this.lastName + " addedDate: " + this.addedDate + " employmentStatus: " + this.employmentStatus + " ]";
   }
 }
