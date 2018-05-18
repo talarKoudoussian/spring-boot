@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS employee (
   first_name varchar(250) NOT NULL,
   last_name varchar(250) NOT NULL,
   added_date varchar(250) NOT NULL,
-  employment_status BIT(1) NOT NULL --0 for deleted record / 1 for valid record,
+  employment_status BIT(1) NOT NULL -- 0 for deleted record / 1 for valid record,
 ) DEFAULT CHARSET=utf8;
