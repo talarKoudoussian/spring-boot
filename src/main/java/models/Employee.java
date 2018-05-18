@@ -1,7 +1,5 @@
 package models;
 
-import java.sql.Timestamp;
-
 public class Employee {
 
   private long employeeId;
@@ -50,7 +48,18 @@ public class Employee {
     this.employmentStatus = employmentStatus;
   }
 
+  @Override
   public String toString(){
-    return "Employee[firstName: " + this.firstName + " lastName: " + this.lastName + " addedDate: " + this.addedDate + " employmentStatus: " + this.employmentStatus + " ]";
+    StringBuilder sb = new StringBuilder();
+    sb.append("Employee[firstName: ");
+    sb.append(this.firstName);
+    sb.append(" lastName: ");
+    sb.append( this.lastName);
+    sb.append(" addedDate: ");
+    sb.append(this.addedDate);
+    sb.append(" employmentStatus: ");
+    sb.append(this.employmentStatus);
+    sb.append( " ]");
+    return sb.toString();
   }
 }
