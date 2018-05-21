@@ -1,9 +1,6 @@
 package employee;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 //import java.text.SimpleDateFormat;
 //import java.util.Date;
 
@@ -12,75 +9,68 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private long employee_id;
-    private String first_name;
-    private String last_name;
-    private String added_date;
-    private boolean employment_status;
-
-//    public Employee(long employeeId, String firstName, String lastName){
-//        this.employeeId = employeeId;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.addedDate = new SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss.fff").format(new Date());
-//        this.employmentStatus = true;
-//    }
-
-    public Employee(){
-        super();
-    }
+    @Column(name="employee_id")
+    private long employeeId;
+    @Column(name="first_name")
+    private String firstName;
+    @Column(name="last_name")
+    private String lastName;
+    @Column(name="added_date")
+    private String addedDate;
+    @Column(name="employment_status")
+    private boolean employmentStatus;
 
     public long getEmployeeId() {
-        return employee_id;
+        return employeeId;
     }
 
     public void setEmployeeId(long employeeId) {
-        this.employee_id = employeeId;
+        this.employeeId = employeeId;
     }
 
     public String getFirstName() {
-        return first_name;
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
-        this.first_name = firstName;
+        this.firstName = firstName;
     }
 
     public String getLastName() {
-        return last_name;
+        return lastName;
     }
 
     public void setLastName(String lastName) {
-        this.last_name = lastName;
+        this.lastName = lastName;
     }
 
     public String getAddedDate() {
-        return added_date;
+        return addedDate;
     }
 
     public void setAddedDate(String addedDate) {
-        this.added_date = addedDate;
+        this.addedDate = addedDate;
     }
 
     public Boolean getStatus() {
-        return employment_status;
+        return employmentStatus;
     }
 
     public void setStatus(boolean employmentStatus) {
-        this.employment_status = employmentStatus;
+        this.employmentStatus = employmentStatus;
     }
 
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append("Employee[firstName: ");
-        sb.append(this.first_name);
+        sb.append(this.firstName);
         sb.append(" lastName: ");
-        sb.append( this.last_name);
+        sb.append( this.lastName);
         sb.append(" addedDate: ");
-        sb.append(this.added_date);
+        sb.append(this.addedDate);
         sb.append(" employmentStatus: ");
-        sb.append(this.employment_status);
+        sb.append(this.employmentStatus);
         sb.append( " ]");
         return sb.toString();
     }
