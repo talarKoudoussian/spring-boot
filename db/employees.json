@@ -1,7 +1,7 @@
 {
-  "employee_id": "3",
-  "first_name": "Albert",
-  "last_name": "Einstein",
-  "added_date": "2018-05-20T00:00:00.000",
-  "employment_status": "1"
+  "employeeId": "3",
+  "firstName": "Albert",
+  "lastName": "Einstein",
+  "addedDate": "2018-05-20T00:00:00.000",
+  "employmentStatus": "1"
 }

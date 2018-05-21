@@ -22,7 +22,7 @@ public class Employee {
     @Column(name="employment_status")
     private boolean employmentStatus;
 
-    public Long getEmployeeId() {
+    public long getEmployeeId() {
         return employeeId;
     }
 
