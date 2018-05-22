@@ -20,6 +20,7 @@ out/
 .project
 .settings/
 bin/
+.idea/
 
 # Compiled class file
 *.class
