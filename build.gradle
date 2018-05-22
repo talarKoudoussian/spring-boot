@@ -22,13 +22,9 @@ repositories {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
-    // https://mvnrepository.com/artifact/javax.persistence/persistence-api
-//    compile group: 'javax.persistence', name: 'persistence-api', version: '1.0'
     // JPA Data (We are going to use Repositories, Entities, Hibernate, etc...)
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // added the following for EntityManager Error > Error creating bean with name 'entityManagerFactory' defined in class path resource
-//    compile("javax.xml.bind:jaxb-api")
-    compile("org.hibernate.javax.persistenc:hibernate-jpa-2.0-api")
+    compile("org.hibernate.javax.persistence:hibernate-jpa-2.0-api")
     compile("org.springframework:spring-jdbc")
     compile 'org.mariadb.jdbc:mariadb-java-client'
     testCompile group: 'junit', name: 'junit', version: '4.12'
