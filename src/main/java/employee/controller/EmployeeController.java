@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 public class EmployeeController {
 
@@ -20,4 +22,19 @@ public class EmployeeController {
         Employee newEmployee = employeeRepository.save(employee);
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public ResponseEntity<Employee> getEmployee(@PathVariable("id") String employeeId){
+        if(employeeId.matches("\\d+")){
+            Long parsedId = Long.valueOf(employeeId);
+            Optional<Employee> employee = employeeRepository.findById(parsedId);
+            if(employee.isPresent()){
+                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
 }
