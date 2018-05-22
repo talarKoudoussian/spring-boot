@@ -37,4 +37,23 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") String employeeId, @RequestBody Employee employee){
+        if(employeeId.matches("\\d+")){
+            Long parsedId = Long.valueOf(employeeId);
+            Optional<Employee> selectedEmployee = employeeRepository.findById(parsedId);
+            if(selectedEmployee.isPresent()){
+                selectedEmployee.get().setFirstName(employee.getFirstName());
+                selectedEmployee.get().setLastName(employee.getLastName());
+                selectedEmployee.get().setAddedDate(employee.getAddedDate());
+                selectedEmployee.get().setEmploymentStatus(employee.getEmploymentStatus());
+                Employee updatedEmployee = employeeRepository.save(selectedEmployee.get());
+                return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
 }
