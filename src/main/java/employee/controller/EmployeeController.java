@@ -25,12 +25,17 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> getEmployee(@PathVariable("id") long employeeId){
-        Optional<Employee> employee = employeeRepository.findById(employeeId);
-        if(employee.isPresent()){
-            return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+    public ResponseEntity<Employee> getEmployee(@PathVariable("id") String employeeId){
+        if(employeeId.matches("\\d+")){
+            Long parsedId = Long.parseLong(employeeId);
+            Optional<Employee> employee = employeeRepository.findById(parsedId);
+            if(employee.isPresent()){
+                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
     }
 
 }
