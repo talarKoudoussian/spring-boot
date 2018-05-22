@@ -56,4 +56,17 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") String employeeId){
+        if(employeeId.matches("\\d+")){
+            Long parsedId = Long.valueOf(employeeId);
+            if(employeeRepository.existsById(parsedId)){
+                employeeRepository.deleteById(parsedId);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
 }
