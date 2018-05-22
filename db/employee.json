@@ -1,7 +1,7 @@
 {
-  "employeeId": "3",
+  "employeeId": "3", // AUTO GENERATED FIELD
   "firstName": "Albert",
   "lastName": "Einstein",
   "addedDate": "2018-05-20T00:00:00.000",
-  "employmentStatus": "1"
+  "employmentStatus": true
 }
