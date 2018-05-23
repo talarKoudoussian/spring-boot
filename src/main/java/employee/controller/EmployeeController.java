@@ -20,6 +20,15 @@ public class EmployeeController {
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
     public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
         System.out.println(employee.toString());
+
+        if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if(!employee.isISODate()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         Employee newEmployee = employeeRepository.save(employee);
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
@@ -28,8 +37,8 @@ public class EmployeeController {
     @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public ResponseEntity<Employee> getEmployee(@PathVariable("id") String employeeId) {
         if(employeeId.matches("\\d+")) {
-            Long parsedId = Long.valueOf(employeeId);
-            Optional<Employee> employee = employeeRepository.findById(parsedId);
+            Long id = Long.valueOf(employeeId);
+            Optional<Employee> employee = employeeRepository.findById(id);
 
             if(employee.isPresent()) {
                 return new ResponseEntity<>(employee.get(), HttpStatus.OK);
@@ -45,15 +54,24 @@ public class EmployeeController {
     @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<Employee> updateEmployee(@PathVariable("id") String employeeId, @RequestBody Employee employee) {
         if(employeeId.matches("\\d+")) {
-            Long parsedId = Long.valueOf(employeeId);
-            Optional<Employee> selectedEmployee = employeeRepository.findById(parsedId);
+            Long id = Long.valueOf(employeeId);
+            Optional<Employee> selectedEmployee = employeeRepository.findById(id);
 
             if(selectedEmployee.isPresent()) {
-                selectedEmployee.get().setFirstName(employee.getFirstName());
-                selectedEmployee.get().setLastName(employee.getLastName());
-                selectedEmployee.get().setAddedDate(employee.getAddedDate());
-                selectedEmployee.get().setEmploymentStatus(employee.getEmploymentStatus());
-                Employee updatedEmployee = employeeRepository.save(selectedEmployee.get());
+                if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+
+                if(!employee.isISODate()) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+
+                Employee emp = selectedEmployee.get();
+                emp.setFirstName(employee.getFirstName());
+                emp.setLastName(employee.getLastName());
+                emp.setAddedDate(employee.getAddedDate());
+                emp.setEmploymentStatus(employee.getEmploymentStatus());
+                Employee updatedEmployee = employeeRepository.save(emp);
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
 
@@ -66,10 +84,10 @@ public class EmployeeController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<Void> deleteEmployee(@PathVariable("id") String employeeId) {
         if(employeeId.matches("\\d+")){
-            Long parsedId = Long.valueOf(employeeId);
+            Long id = Long.valueOf(employeeId);
 
-            if(employeeRepository.existsById(parsedId)) {
-                employeeRepository.deleteById(parsedId);
+            if(employeeRepository.existsById(id)) {
+                employeeRepository.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
 
@@ -82,10 +100,9 @@ public class EmployeeController {
     @ResponseBody
     @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/json;charset=UTF-8", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> updatePartialEmployee(@PathVariable("id") String employeeId, @RequestBody Employee partialEmployee) {
-
         if (employeeId.matches("\\d+")) {
-            Long parsedId = Long.valueOf(employeeId);
-            Optional<Employee> selectedEmployee = employeeRepository.findById(parsedId);
+            Long id = Long.valueOf(employeeId);
+            Optional<Employee> selectedEmployee = employeeRepository.findById(id);
 
             if(selectedEmployee.isPresent()) {
                 Employee emp = selectedEmployee.get();
@@ -99,6 +116,11 @@ public class EmployeeController {
                 }
 
                 if(!partialEmployee.isAddedDateEmpty()) {
+
+                    if(!partialEmployee.isISODate()){
+                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                    }
+
                     emp.setAddedDate(partialEmployee.getAddedDate());
                 }
 
