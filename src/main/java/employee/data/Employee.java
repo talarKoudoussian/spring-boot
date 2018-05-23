@@ -1,5 +1,7 @@
 package employee.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -21,7 +23,7 @@ public class Employee {
     private String addedDate;
 
     @Column(name="employment_status")
-    private boolean employmentStatus;
+    private Boolean employmentStatus;
 
     public long getEmployeeId() {
         return employeeId;
@@ -39,12 +41,22 @@ public class Employee {
         this.firstName = firstName;
     }
 
+    @JsonIgnore
+    public boolean isFirstNameEmpty() {
+        return firstName == null;
+    }
+
     public String getLastName() {
         return lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    @JsonIgnore
+    public boolean isLastNameEmpty() {
+        return lastName == null;
     }
 
     public String getAddedDate() {
@@ -55,12 +67,22 @@ public class Employee {
         this.addedDate = addedDate;
     }
 
-    public boolean getEmploymentStatus() {
+    @JsonIgnore
+    public boolean isAddedDateEmpty() {
+        return addedDate == null;
+    }
+
+    public Boolean getEmploymentStatus() {
         return employmentStatus;
     }
 
-    public void setEmploymentStatus(boolean employmentStatus) {
+    public void setEmploymentStatus(Boolean employmentStatus) {
         this.employmentStatus = employmentStatus;
+    }
+
+    @JsonIgnore
+    public boolean isEmploymentStatusEmpty() {
+        return employmentStatus == null;
     }
 
     @Override
