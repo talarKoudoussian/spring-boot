@@ -81,15 +81,32 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/json;charset=UTF-8", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Employee> partialUpdateEmploymentStatus(@PathVariable("id") String employeeId, @RequestBody Employee partialEmployee) {
+    public ResponseEntity<Employee> updatePartialEmployee(@PathVariable("id") String employeeId, @RequestBody Employee partialEmployee) {
 
         if (employeeId.matches("\\d+")) {
             Long parsedId = Long.valueOf(employeeId);
             Optional<Employee> selectedEmployee = employeeRepository.findById(parsedId);
 
             if(selectedEmployee.isPresent()) {
-                selectedEmployee.get().setEmploymentStatus(partialEmployee.getEmploymentStatus());
-                Employee updatedEmployee = employeeRepository.save(selectedEmployee.get());
+                Employee emp = selectedEmployee.get();
+
+                if(!partialEmployee.isFirstNameEmpty()) {
+                    emp.setFirstName(partialEmployee.getFirstName());
+                }
+
+                if(!partialEmployee.isLastNameEmpty()) {
+                    emp.setLastName(partialEmployee.getLastName());
+                }
+
+                if(!partialEmployee.isAddedDateEmpty()) {
+                    emp.setAddedDate(partialEmployee.getAddedDate());
+                }
+
+                if(!partialEmployee.isEmploymentStatusEmpty()) {
+                    emp.setEmploymentStatus(partialEmployee.getEmploymentStatus());
+                }
+
+                Employee updatedEmployee = employeeRepository.save(emp);
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
 
