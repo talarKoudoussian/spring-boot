@@ -1,9 +1,11 @@
 package employee.controller;
 
 import employee.data.Employee;
+import employee.data.EmployeeEmploymentStatusDTO;
 import employee.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +69,24 @@ public class EmployeeController {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/json;charset=UTF-8", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Employee> partialUpdateEmploymentStatus(@PathVariable("id") String employeeId, @RequestBody EmployeeEmploymentStatusDTO partialUpdate){
+
+        if (employeeId.matches("\\d+")){
+            Long parsedId = Long.valueOf(employeeId);
+            Optional<Employee> selectedEmployee = employeeRepository.findById(parsedId);
+            if(selectedEmployee.isPresent()){
+                selectedEmployee.get().setEmploymentStatus(partialUpdate.getEmploymentStatus());
+                Employee updatedEmployee = employeeRepository.save(selectedEmployee.get());
+                return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 
 }
