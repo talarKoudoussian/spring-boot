@@ -1,7 +1,6 @@
 package employee.controller;
 
 import employee.data.Employee;
-import employee.data.EmployeeEmploymentStatusDTO;
 import employee.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee){
+    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
         System.out.println(employee.toString());
         Employee newEmployee = employeeRepository.save(employee);
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
@@ -27,25 +26,29 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> getEmployee(@PathVariable("id") String employeeId){
-        if(employeeId.matches("\\d+")){
+    public ResponseEntity<Employee> getEmployee(@PathVariable("id") String employeeId) {
+        if(employeeId.matches("\\d+")) {
             Long parsedId = Long.valueOf(employeeId);
             Optional<Employee> employee = employeeRepository.findById(parsedId);
-            if(employee.isPresent()){
+
+            if(employee.isPresent()) {
                 return new ResponseEntity<>(employee.get(), HttpStatus.OK);
             }
+
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") String employeeId, @RequestBody Employee employee){
-        if(employeeId.matches("\\d+")){
+    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") String employeeId, @RequestBody Employee employee) {
+        if(employeeId.matches("\\d+")) {
             Long parsedId = Long.valueOf(employeeId);
             Optional<Employee> selectedEmployee = employeeRepository.findById(parsedId);
-            if(selectedEmployee.isPresent()){
+
+            if(selectedEmployee.isPresent()) {
                 selectedEmployee.get().setFirstName(employee.getFirstName());
                 selectedEmployee.get().setLastName(employee.getLastName());
                 selectedEmployee.get().setAddedDate(employee.getAddedDate());
@@ -53,40 +56,47 @@ public class EmployeeController {
                 Employee updatedEmployee = employeeRepository.save(selectedEmployee.get());
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
+
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") String employeeId){
+    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") String employeeId) {
         if(employeeId.matches("\\d+")){
             Long parsedId = Long.valueOf(employeeId);
-            if(employeeRepository.existsById(parsedId)){
+
+            if(employeeRepository.existsById(parsedId)) {
                 employeeRepository.deleteById(parsedId);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/json;charset=UTF-8", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Employee> partialUpdateEmploymentStatus(@PathVariable("id") String employeeId, @RequestBody EmployeeEmploymentStatusDTO partialUpdate){
+    public ResponseEntity<Employee> partialUpdateEmploymentStatus(@PathVariable("id") String employeeId, @RequestBody Employee partialEmployee) {
 
-        if (employeeId.matches("\\d+")){
+        if (employeeId.matches("\\d+")) {
             Long parsedId = Long.valueOf(employeeId);
             Optional<Employee> selectedEmployee = employeeRepository.findById(parsedId);
-            if(selectedEmployee.isPresent()){
-                selectedEmployee.get().setEmploymentStatus(partialUpdate.getEmploymentStatus());
+
+            if(selectedEmployee.isPresent()) {
+                selectedEmployee.get().setEmploymentStatus(partialEmployee.getEmploymentStatus());
                 Employee updatedEmployee = employeeRepository.save(selectedEmployee.get());
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
+
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }
