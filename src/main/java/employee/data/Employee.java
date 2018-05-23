@@ -3,8 +3,6 @@ package employee.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "employee")
@@ -72,20 +70,6 @@ public class Employee {
     @JsonIgnore
     public boolean isAddedDateEmpty() {
         return addedDate == null;
-    }
-
-    @JsonIgnore
-    public boolean isISODate(){
-        try{
-            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME; //ofPattern("yyyy-MM-dd'T'HH:mm");
-
-            LocalDateTime.parse(addedDate, formatter);
-
-            return true;
-        }
-        catch (Exception e){
-            return false;
-        }
     }
 
     public boolean getEmploymentStatus() {

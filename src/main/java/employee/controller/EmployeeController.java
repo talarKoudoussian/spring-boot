@@ -25,10 +25,6 @@ public class EmployeeController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if(!employee.isISODate()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
         Employee newEmployee = employeeRepository.save(employee);
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
@@ -59,10 +55,6 @@ public class EmployeeController {
 
             if(selectedEmployee.isPresent()) {
                 if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                }
-
-                if(!employee.isISODate()) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
 
@@ -116,11 +108,6 @@ public class EmployeeController {
                 }
 
                 if(!partialEmployee.isAddedDateEmpty()) {
-
-                    if(!partialEmployee.isISODate()){
-                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                    }
-
                     emp.setAddedDate(partialEmployee.getAddedDate());
                 }
 
