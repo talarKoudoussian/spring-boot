@@ -72,11 +72,11 @@ public class Employee {
         return addedDate == null;
     }
 
-    public boolean getEmploymentStatus() {
+    public Boolean getEmploymentStatus() {
         return employmentStatus;
     }
 
-    public void setEmploymentStatus(boolean employmentStatus) {
+    public void setEmploymentStatus(Boolean employmentStatus) {
         this.employmentStatus = employmentStatus;
     }
 
