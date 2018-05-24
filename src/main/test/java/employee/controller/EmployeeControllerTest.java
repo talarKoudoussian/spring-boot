@@ -1,5 +1,7 @@
 package employee.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import employee.controller.EmployeeController;
 import employee.data.Employee;
 import employee.repository.EmployeeRepository;
 import org.apache.catalina.filters.CorsFilter;
@@ -16,13 +18,15 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class EmployeeControllerTest {
 
     private MockMvc mockMvc;
+    private Employee employee;
+    private String jsonEmployee;
 
     @Mock
     private EmployeeRepository employeeRepository;
@@ -36,29 +40,32 @@ public class EmployeeControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(employeeController)
                 .addFilters(new CorsFilter())
                 .build();
+
+        employee = new Employee();
+        employee.setFirstName("Test");
+        employee.setLastName("One");
+        employee.setAddedDate("2018-05-24T09:36:00.000");
+        employee.setEmploymentStatus(Boolean.TRUE);
+
+        jsonEmployee = asJsonString(employee);
     }
 
     @Test
     public void testGetEmployee200() throws Exception {
-        Employee emp = new Employee();
-        emp.setEmployeeId(Long.valueOf(1));
-        emp.setFirstName("Test");
-        emp.setLastName("One");
-        emp.setAddedDate("2018-05-24T09:36:00.000");
-        emp.setEmploymentStatus(Boolean.TRUE);
-
-        when(employeeRepository.findById(emp.getEmployeeId())).thenReturn(java.util.Optional.ofNullable(emp));
+        employee.setEmployeeId(Long.valueOf(1));
+        when(employeeRepository.findById(employee.getEmployeeId())).thenReturn(java.util.Optional.ofNullable(employee));
 
         mockMvc.perform(get("/employees/{id}", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.employeeId", is(Integer.valueOf(1))))
-                .andExpect(jsonPath("$.firstName", is(emp.getFirstName())))
-                .andExpect(jsonPath("$.lastName", is(emp.getLastName())))
-                .andExpect(jsonPath("$.addedDate", is(emp.getAddedDate())))
-                .andExpect(jsonPath("$.employmentStatus", is(emp.getEmploymentStatus())));
+                .andExpect(jsonPath("$.firstName", is(employee.getFirstName())))
+                .andExpect(jsonPath("$.lastName", is(employee.getLastName())))
+                .andExpect(jsonPath("$.addedDate", is(employee.getAddedDate())))
+                .andExpect(jsonPath("$.employmentStatus", is(employee.getEmploymentStatus())))
+                .andDo(print());
 
-        verify(employeeRepository, times(1)).findById(emp.getEmployeeId());
+        verify(employeeRepository, times(1)).findById(employee.getEmployeeId());
         verifyNoMoreInteractions(employeeRepository);
     }
 
@@ -95,5 +102,27 @@ public class EmployeeControllerTest {
 
         verify(employeeRepository, times(1)).existsById(Long.valueOf(1));
         verifyNoMoreInteractions(employeeRepository);
+    }
+
+    @Test
+    public void testAddEmployee200() throws Exception {
+        when(employeeRepository.save(employee)).thenReturn(employee);
+
+        mockMvc.perform(post("/employees")
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(jsonEmployee))
+                .andExpect(status().isCreated())
+                .andDo(print());
+
+        verify(employeeRepository).save(refEq(employee));
+        verifyNoMoreInteractions(employeeRepository);
+    }
+
+    public static String asJsonString(Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
