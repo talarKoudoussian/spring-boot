@@ -39,7 +39,7 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    public void testGetEmployeeSuccess() throws Exception {
+    public void testGetEmployee200() throws Exception {
         Employee emp = new Employee();
         emp.setEmployeeId(Long.valueOf(1));
         emp.setFirstName("Test");
@@ -74,7 +74,7 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    public void testDeleteEmployeeSuccess() throws Exception {
+    public void testDeleteEmployee200() throws Exception {
         when(Boolean.valueOf(employeeRepository.existsById(Long.valueOf(1)))).thenReturn(Boolean.TRUE);
         doNothing().when(employeeRepository).deleteById(Long.valueOf(1));
 
