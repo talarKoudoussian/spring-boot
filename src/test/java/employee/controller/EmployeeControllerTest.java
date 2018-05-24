@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -73,10 +74,26 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    public void testGetEmployeeFailInputNAN404NotFound() throws Exception {
-        mockMvc.perform(get("employees/{id}", "word"))
+    public void testDeleteEmployeeSuccess() throws Exception {
+        when(Boolean.valueOf(employeeRepository.existsById(Long.valueOf(1)))).thenReturn(Boolean.TRUE);
+        doNothing().when(employeeRepository).deleteById(Long.valueOf(1));
+
+        mockMvc.perform(delete("/employees/{id}", "1"))
+                .andExpect(status().isOk());
+
+        verify(employeeRepository, times(1)).existsById(Long.valueOf(1));
+        verify(employeeRepository, times(1)).deleteById(Long.valueOf(1));
+        verifyNoMoreInteractions(employeeRepository);
+    }
+
+    @Test
+    public void testDeleteEmployee404() throws Exception {
+        when(Boolean.valueOf(employeeRepository.existsById(Long.valueOf(1)))).thenReturn(Boolean.FALSE);
+
+        mockMvc.perform(delete("/employees/{id}", "1"))
                 .andExpect(status().isNotFound());
 
+        verify(employeeRepository, times(1)).existsById(Long.valueOf(1));
         verifyNoMoreInteractions(employeeRepository);
     }
 }
