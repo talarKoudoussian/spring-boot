@@ -11,7 +11,7 @@ public class Employee {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name="employee_id")
-    private long employeeId;
+    private Long employeeId;
 
     @Column(name="first_name")
     private String firstName;
@@ -25,11 +25,11 @@ public class Employee {
     @Column(name="employment_status")
     private Boolean employmentStatus;
 
-    public long getEmployeeId() {
+    public Long getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(long employeeId) {
+    public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
     }
 

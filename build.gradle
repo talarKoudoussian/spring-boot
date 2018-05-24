@@ -28,6 +28,11 @@ dependencies {
     compile 'org.springframework:spring-jdbc'
     compile 'org.mariadb.jdbc:mariadb-java-client'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.springframework:spring-test'
+    compile 'org.mockito:mockito-core'
+    compile 'org.springframework.boot:spring-boot-starter-test'
+    compile 'org.hamcrest:hamcrest'
+    compile 'com.jayway.jsonpath:json-path-assert'
 }
 
 apply plugin: 'java'
