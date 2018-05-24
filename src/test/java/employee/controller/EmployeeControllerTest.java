@@ -63,7 +63,7 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    public void testGetEmployeeFail404NotFound() throws Exception {
+    public void testGetEmployee404() throws Exception {
         when(employeeRepository.findById(Long.valueOf(1))).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/employees/{id}", "1"))
