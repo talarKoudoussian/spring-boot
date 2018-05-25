@@ -1,4 +1,4 @@
-package employee.controller;
+package java.employee.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import employee.controller.EmployeeController;
@@ -106,15 +106,23 @@ public class EmployeeControllerTest {
 
     @Test
     public void testAddEmployee200() throws Exception {
-        when(employeeRepository.save(employee)).thenReturn(employee);
+        Employee addedEmployee = employee;
+        addedEmployee.setEmployeeId(Long.valueOf(1));
+
+        when(employeeRepository.save(any(Employee.class))).thenReturn(addedEmployee);
 
         mockMvc.perform(post("/employees")
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(jsonEmployee))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeId", is(Integer.valueOf(1))))
+                .andExpect(jsonPath("$.firstName", is(addedEmployee.getFirstName())))
+                .andExpect(jsonPath("$.lastName", is(addedEmployee.getLastName())))
+                .andExpect(jsonPath("$.addedDate", is(addedEmployee.getAddedDate())))
+                .andExpect(jsonPath("$.employmentStatus", is(addedEmployee.getEmploymentStatus())))
                 .andDo(print());
 
-        verify(employeeRepository).save(refEq(employee));
+        verify(employeeRepository).save(any(Employee.class));
         verifyNoMoreInteractions(employeeRepository);
     }
 
