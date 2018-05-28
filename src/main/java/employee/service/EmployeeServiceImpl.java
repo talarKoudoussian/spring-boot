@@ -31,6 +31,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             case "2.0" : returnEmployee = getEmployeeMongo(id);
                         break;
             default: returnEmployee = getEmployeeMongo(id);
+                        break;
         }
 
         return returnEmployee;
