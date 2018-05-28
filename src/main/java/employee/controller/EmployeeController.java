@@ -4,7 +4,8 @@ import employee.data.EmployeeJPA;
 import employee.repository.EmployeeJPARepository;
 import employee.repository.EmployeeMongoRepository;
 import employee.service.EmployeeServiceImpl;
-import employee.utility.EmployeeUtil;
+import employee.utility.HttpRequestUtil;
+import javassist.bytecode.stackmap.TypeData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 public class EmployeeController {
@@ -26,7 +29,9 @@ public class EmployeeController {
     @Autowired
     EmployeeServiceImpl employeeService;
 
-    EmployeeUtil employeeUtil = new EmployeeUtil();
+    HttpRequestUtil employeeUtil = new HttpRequestUtil();
+
+    private static final Logger LOGGER = Logger.getLogger( TypeData.ClassName.class.getName() );
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
@@ -46,8 +51,8 @@ public class EmployeeController {
     public ResponseEntity<? extends  Object> getEmployee(@PathVariable("id") String id, HttpServletRequest request) {
 
         String contentType = request.getContentType();
-        System.out.println(contentType);
-        int version = employeeUtil.checkHeader(contentType);
+        LOGGER.log(Level.INFO, contentType);
+        double version = employeeUtil.checkHeader(contentType);
 
         if(version == -1){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

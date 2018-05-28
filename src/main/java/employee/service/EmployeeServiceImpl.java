@@ -18,17 +18,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     EmployeeMongoRepository employeeMongoRepository;
 
-    public Object getEmployee(String id, int version) {
-        if(version == 1) {
-            return getEmployeeJPA(id);
-        }
-        else if(version >= 2) {
-            return getEmployeeMongo(id);
-        }
-        else {
-            return null;
+    @Override
+    public Object getEmployee(String id, double version) {
+        Object returnEmployee;
+        String strVersion = String.valueOf(version);
+
+        switch (strVersion) {
+            case "-1" : returnEmployee = null;
+                        break;
+            case "1.0" : returnEmployee = getEmployeeJPA(id);
+                        break;
+            case "2.0" : returnEmployee = getEmployeeMongo(id);
+                        break;
+            default: returnEmployee = getEmployeeMongo(id);
         }
 
+        return returnEmployee;
     }
 
     public EmployeeJPA getEmployeeJPA(String id) {
@@ -49,11 +54,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public EmployeeMongo getEmployeeMongo(String id) {
 
-        if(id.matches("\\d+")){
+        if(id.matches("\\d+")) {
             Long empId = Long.valueOf(id);
             Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
 
-            if(employeeOpt.isPresent()){
+            if(employeeOpt.isPresent()) {
                 return employeeOpt.get();
             }
 
