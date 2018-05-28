@@ -1,10 +1,10 @@
 package employee.controller;
 
 import employee.data.EmployeeJPA;
-import employee.data.EmployeeMongo;
-import employee.repository.EmployeeMongoRepository;
 import employee.repository.EmployeeJPARepository;
-import employee.service.EmployeeService;
+import employee.repository.EmployeeMongoRepository;
+import employee.service.EmployeeServiceImpl;
+import employee.utility.EmployeeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +24,10 @@ public class EmployeeController {
     EmployeeMongoRepository employeeMongoRepository;
 
     @Autowired
-    EmployeeService employeeService;
+    EmployeeServiceImpl employeeService;
+
+//    @Autowired
+    EmployeeUtil employeeUtil = new EmployeeUtil();
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
@@ -41,49 +44,24 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = { "application/vnd.pl.employee+json"})
-    public ResponseEntity getEmployee(@PathVariable("id") String employeeId, HttpServletRequest request) {
+    public ResponseEntity<? extends  Object> getEmployee(@PathVariable("id") String id, HttpServletRequest request) {
 
-        String contentType = request.getHeader("Content-Type");
-        String version = employeeService.getVersion(contentType);
+        String contentType = request.getContentType();
+        System.out.println(contentType);
+        int version = employeeUtil.checkHeader(contentType);
 
-        if(version.equals("1.0")){
-            return getEmployeeJPA(employeeId);
+        if(version == -1){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        else if(version.equals("2.0")){
-            return getEmployeeMongo(employeeId);
-        }
-        else {
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
 
-    public ResponseEntity<EmployeeJPA> getEmployeeJPA(String employeeId) {
-        if(employeeId.matches("\\d+")) {
-            Long id = Long.valueOf(employeeId);
-            Optional<EmployeeJPA> employee = employeeRepository.findById(id);
+        Object employee = employeeService.getEmployee(id, version);
 
-            if(employee.isPresent()) {
-                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
-            }
-
+        if (employee != null) {
+            return new ResponseEntity<>(employee, HttpStatus.OK);
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    public ResponseEntity<EmployeeMongo> getEmployeeMongo(String employeeId) {
-        if(employeeId.matches("\\d+")){
-            Optional<EmployeeMongo> employee = employeeMongoRepository.findByEmployeeId(employeeId);
-
-            if(employee.isPresent()){
-                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
-            }
-
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @ResponseBody
