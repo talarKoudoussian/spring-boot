@@ -26,7 +26,6 @@ public class EmployeeController {
     @Autowired
     EmployeeServiceImpl employeeService;
 
-//    @Autowired
     EmployeeUtil employeeUtil = new EmployeeUtil();
 
     @ResponseBody
