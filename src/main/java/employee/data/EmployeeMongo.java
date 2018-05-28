@@ -1,38 +1,38 @@
 package employee.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import javax.persistence.*;
+import javax.persistence.Id;
 
-
-@Entity
-@Table(name = "employee")
-public class Employee {
+@Document(collection = "employees")
+public class EmployeeMongo {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    @Column(name="employee_id")
-    private Long employeeId;
+    @Field("employeeId")
+    private String employeeId;
 
-    @Column(name="first_name")
+    @Field("firstName")
     private String firstName;
 
-    @Column(name="last_name")
+    @Field("lastName")
     private String lastName;
 
-    @Column(name="added_date")
+    @Field("addedDate")
     private String addedDate;
 
-    @Column(name="employment_status")
+    @Field("employmentStatus")
     private Boolean employmentStatus;
 
+    @Field("datasource")
     private String datasource;
 
-    public Long getEmployeeId() {
+    public String getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(Long employeeId) {
+    public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
     }
 
@@ -109,5 +109,6 @@ public class Employee {
         sb.append(employmentStatus);
         sb.append("]");
         return sb.toString();
+
     }
 }

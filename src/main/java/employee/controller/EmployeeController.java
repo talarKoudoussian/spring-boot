@@ -1,6 +1,8 @@
 package employee.controller;
 
 import employee.data.Employee;
+import employee.data.EmployeeMongo;
+import employee.repository.EmployeeMongoRepository;
 import employee.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @RestController
@@ -15,6 +18,9 @@ public class EmployeeController {
 
     @Autowired
     EmployeeRepository employeeRepository;
+
+    @Autowired
+    EmployeeMongoRepository employeeMongoRepository;
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
@@ -30,13 +36,56 @@ public class EmployeeController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> getEmployee(@PathVariable("id") String employeeId) {
+    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = { "application/vnd.pl.employee+json"})
+    public ResponseEntity getEmployee(@PathVariable("id") String employeeId, HttpServletRequest request) {
+
+        String contentType = request.getHeader("Content-Type");
+        System.out.println(contentType);
+
+        int version = contentType.indexOf("version");
+        System.out.println(contentType.indexOf("version"));
+
+          if(version == -1){
+              return getEmployeeV2(employeeId);
+          }
+          else {
+              String v = contentType.substring(contentType.indexOf("version"));
+
+              if(v.equals("version=1.0")){
+                return getEmployeeV1(employeeId);
+              }
+              else {
+                  return getEmployeeV2(employeeId);
+              }
+
+          }
+    }
+
+//    @ResponseBody
+//    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json;version:1.0")
+    public ResponseEntity<Employee> getEmployeeV1(String employeeId) {
         if(employeeId.matches("\\d+")) {
             Long id = Long.valueOf(employeeId);
             Optional<Employee> employee = employeeRepository.findById(id);
 
             if(employee.isPresent()) {
+                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+
+//    @ResponseBody
+//    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json;version:2.0")
+    public ResponseEntity<EmployeeMongo> getEmployeeV2(String employeeId) {
+        if(employeeId.matches("\\d+")){
+            Optional<EmployeeMongo> employee = employeeMongoRepository.findByEmployeeId(employeeId);
+
+            if(employee.isPresent()){
                 return new ResponseEntity<>(employee.get(), HttpStatus.OK);
             }
 
