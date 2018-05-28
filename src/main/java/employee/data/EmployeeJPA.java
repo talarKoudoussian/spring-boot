@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "employee")
-public class Employee {
+public class EmployeeJPA {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)

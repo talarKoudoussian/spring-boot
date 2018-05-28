@@ -1,9 +1,10 @@
 package employee.controller;
 
-import employee.data.Employee;
+import employee.data.EmployeeJPA;
 import employee.data.EmployeeMongo;
 import employee.repository.EmployeeMongoRepository;
-import employee.repository.EmployeeRepository;
+import employee.repository.EmployeeJPARepository;
+import employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,21 +18,24 @@ import java.util.Optional;
 public class EmployeeController {
 
     @Autowired
-    EmployeeRepository employeeRepository;
+    EmployeeJPARepository employeeRepository;
 
     @Autowired
     EmployeeMongoRepository employeeMongoRepository;
 
+    @Autowired
+    EmployeeService employeeService;
+
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<EmployeeJPA> addEmployee(@RequestBody EmployeeJPA employee) {
         System.out.println(employee.toString());
 
         if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Employee newEmployee = employeeRepository.save(employee);
+        EmployeeJPA newEmployee = employeeRepository.save(employee);
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
 
@@ -40,33 +44,23 @@ public class EmployeeController {
     public ResponseEntity getEmployee(@PathVariable("id") String employeeId, HttpServletRequest request) {
 
         String contentType = request.getHeader("Content-Type");
-        System.out.println(contentType);
+        String version = employeeService.getVersion(contentType);
 
-        int version = contentType.indexOf("version");
-        System.out.println(contentType.indexOf("version"));
-
-          if(version == -1){
-              return getEmployeeV2(employeeId);
-          }
-          else {
-              String v = contentType.substring(contentType.indexOf("version"));
-
-              if(v.equals("version=1.0")){
-                return getEmployeeV1(employeeId);
-              }
-              else {
-                  return getEmployeeV2(employeeId);
-              }
-
-          }
+        if(version.equals("1.0")){
+            return getEmployeeJPA(employeeId);
+        }
+        else if(version.equals("2.0")){
+            return getEmployeeMongo(employeeId);
+        }
+        else {
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
-//    @ResponseBody
-//    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json;version:1.0")
-    public ResponseEntity<Employee> getEmployeeV1(String employeeId) {
+    public ResponseEntity<EmployeeJPA> getEmployeeJPA(String employeeId) {
         if(employeeId.matches("\\d+")) {
             Long id = Long.valueOf(employeeId);
-            Optional<Employee> employee = employeeRepository.findById(id);
+            Optional<EmployeeJPA> employee = employeeRepository.findById(id);
 
             if(employee.isPresent()) {
                 return new ResponseEntity<>(employee.get(), HttpStatus.OK);
@@ -78,10 +72,7 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-
-//    @ResponseBody
-//    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json;version:2.0")
-    public ResponseEntity<EmployeeMongo> getEmployeeV2(String employeeId) {
+    public ResponseEntity<EmployeeMongo> getEmployeeMongo(String employeeId) {
         if(employeeId.matches("\\d+")){
             Optional<EmployeeMongo> employee = employeeMongoRepository.findByEmployeeId(employeeId);
 
@@ -97,22 +88,22 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") String employeeId, @RequestBody Employee employee) {
+    public ResponseEntity<EmployeeJPA> updateEmployee(@PathVariable("id") String employeeId, @RequestBody EmployeeJPA employee) {
         if(employeeId.matches("\\d+")) {
             Long id = Long.valueOf(employeeId);
-            Optional<Employee> selectedEmployee = employeeRepository.findById(id);
+            Optional<EmployeeJPA> selectedEmployee = employeeRepository.findById(id);
 
             if(selectedEmployee.isPresent()) {
                 if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
 
-                Employee emp = selectedEmployee.get();
+                EmployeeJPA emp = selectedEmployee.get();
                 emp.setFirstName(employee.getFirstName());
                 emp.setLastName(employee.getLastName());
                 emp.setAddedDate(employee.getAddedDate());
                 emp.setEmploymentStatus(employee.getEmploymentStatus());
-                Employee updatedEmployee = employeeRepository.save(emp);
+                EmployeeJPA updatedEmployee = employeeRepository.save(emp);
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
 
@@ -140,13 +131,13 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/json;charset=UTF-8", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Employee> updatePartialEmployee(@PathVariable("id") String employeeId, @RequestBody Employee partialEmployee) {
+    public ResponseEntity<EmployeeJPA> updatePartialEmployee(@PathVariable("id") String employeeId, @RequestBody EmployeeJPA partialEmployee) {
         if (employeeId.matches("\\d+")) {
             Long id = Long.valueOf(employeeId);
-            Optional<Employee> selectedEmployee = employeeRepository.findById(id);
+            Optional<EmployeeJPA> selectedEmployee = employeeRepository.findById(id);
 
             if(selectedEmployee.isPresent()) {
-                Employee emp = selectedEmployee.get();
+                EmployeeJPA emp = selectedEmployee.get();
 
                 if(!partialEmployee.isFirstNameEmpty()) {
                     emp.setFirstName(partialEmployee.getFirstName());
@@ -164,7 +155,7 @@ public class EmployeeController {
                     emp.setEmploymentStatus(partialEmployee.getEmploymentStatus());
                 }
 
-                Employee updatedEmployee = employeeRepository.save(emp);
+                EmployeeJPA updatedEmployee = employeeRepository.save(emp);
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
 
