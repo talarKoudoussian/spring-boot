@@ -1,69 +1,88 @@
 package employee.controller;
 
-import employee.data.Employee;
-import employee.repository.EmployeeRepository;
+import employee.data.EmployeeJPA;
+import employee.repository.EmployeeJPARepository;
+import employee.repository.EmployeeMongoRepository;
+import employee.service.EmployeeServiceImpl;
+import employee.utility.HttpRequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @RestController
 public class EmployeeController {
 
     @Autowired
-    EmployeeRepository employeeRepository;
+    EmployeeJPARepository employeeRepository;
+
+    @Autowired
+    EmployeeMongoRepository employeeMongoRepository;
+
+    @Autowired
+    EmployeeServiceImpl employeeService;
+
+    HttpRequestUtil headerUtils = new HttpRequestUtil();
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<EmployeeJPA> addEmployee(@RequestBody EmployeeJPA employee) {
         System.out.println(employee.toString());
 
         if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Employee newEmployee = employeeRepository.save(employee);
+        EmployeeJPA newEmployee = employeeRepository.save(employee);
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
 
     @ResponseBody
-    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> getEmployee(@PathVariable("id") String employeeId) {
-        if(employeeId.matches("\\d+")) {
-            Long id = Long.valueOf(employeeId);
-            Optional<Employee> employee = employeeRepository.findById(id);
+    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = { "application/vnd.pl.employee+json"})
+    public ResponseEntity<? extends  Object> getEmployee(@PathVariable("id") String id, HttpServletRequest request) {
 
-            if(employee.isPresent()) {
-                return new ResponseEntity<>(employee.get(), HttpStatus.OK);
+        String contentType = request.getContentType();
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        double version = headerUtils.getVersion(contentType);
+
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object employee = employeeService.getEmployee(id, version);
+
+            if (employee != null) {
+                return new ResponseEntity<>(employee, HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") String employeeId, @RequestBody Employee employee) {
+    public ResponseEntity<EmployeeJPA> updateEmployee(@PathVariable("id") String employeeId, @RequestBody EmployeeJPA employee) {
         if(employeeId.matches("\\d+")) {
             Long id = Long.valueOf(employeeId);
-            Optional<Employee> selectedEmployee = employeeRepository.findById(id);
+            Optional<EmployeeJPA> selectedEmployee = employeeRepository.findById(id);
 
             if(selectedEmployee.isPresent()) {
                 if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
 
-                Employee emp = selectedEmployee.get();
+                EmployeeJPA emp = selectedEmployee.get();
                 emp.setFirstName(employee.getFirstName());
                 emp.setLastName(employee.getLastName());
                 emp.setAddedDate(employee.getAddedDate());
                 emp.setEmploymentStatus(employee.getEmploymentStatus());
-                Employee updatedEmployee = employeeRepository.save(emp);
+                EmployeeJPA updatedEmployee = employeeRepository.save(emp);
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
 
@@ -91,13 +110,13 @@ public class EmployeeController {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/json;charset=UTF-8", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Employee> updatePartialEmployee(@PathVariable("id") String employeeId, @RequestBody Employee partialEmployee) {
+    public ResponseEntity<EmployeeJPA> updatePartialEmployee(@PathVariable("id") String employeeId, @RequestBody EmployeeJPA partialEmployee) {
         if (employeeId.matches("\\d+")) {
             Long id = Long.valueOf(employeeId);
-            Optional<Employee> selectedEmployee = employeeRepository.findById(id);
+            Optional<EmployeeJPA> selectedEmployee = employeeRepository.findById(id);
 
             if(selectedEmployee.isPresent()) {
-                Employee emp = selectedEmployee.get();
+                EmployeeJPA emp = selectedEmployee.get();
 
                 if(!partialEmployee.isFirstNameEmpty()) {
                     emp.setFirstName(partialEmployee.getFirstName());
@@ -115,7 +134,7 @@ public class EmployeeController {
                     emp.setEmploymentStatus(partialEmployee.getEmploymentStatus());
                 }
 
-                Employee updatedEmployee = employeeRepository.save(emp);
+                EmployeeJPA updatedEmployee = employeeRepository.save(emp);
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
 

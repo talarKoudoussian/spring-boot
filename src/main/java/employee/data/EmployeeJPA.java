@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
+
 @Entity
 @Table(name = "employee")
-public class Employee {
+public class EmployeeJPA {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -24,6 +25,8 @@ public class Employee {
 
     @Column(name="employment_status")
     private Boolean employmentStatus;
+
+    private String datasource;
 
     public Long getEmployeeId() {
         return employeeId;
@@ -78,6 +81,14 @@ public class Employee {
 
     public void setEmploymentStatus(Boolean employmentStatus) {
         this.employmentStatus = employmentStatus;
+    }
+
+    public String getDatasource() {
+        return this.datasource;
+    }
+
+    public void setDatasource(String datasource) {
+        this.datasource = datasource;
     }
 
     @JsonIgnore
