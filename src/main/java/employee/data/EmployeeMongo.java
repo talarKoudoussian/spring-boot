@@ -99,6 +99,11 @@ public class EmployeeMongo {
         return employmentStatus == null;
     }
 
+    @JsonIgnore
+    public boolean isDatasourceEmpty() {
+        return datasource == null;
+    }
+
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();

@@ -97,6 +97,96 @@ public class EmployeeServiceImpl implements EmployeeService {
         return deletedEmployee;
     }
 
+    @Override
+    public Object updatePartialEmployee(String id, EmployeeJPA partialEmployeeJPA, int version) {
+        Object updatedEmployee = null;
+
+        switch (version) {
+            case 1: {
+                updatedEmployee = updatePartialEmployeeJPA(id, partialEmployeeJPA);
+                break;
+            }
+            case 2:
+            default: {
+                EmployeeMongo partialEmployeeMongo = toEmployeeMongo(partialEmployeeJPA);
+                updatedEmployee = updatePartialEmployeeMongo(id, partialEmployeeMongo);
+                break;
+            }
+        }
+
+        return updatedEmployee;
+    }
+
+    private EmployeeJPA updatePartialEmployeeJPA(String id, EmployeeJPA partialEmployeeJPA) {
+        EmployeeJPA updatedEmployee = null;
+
+        if (id.matches("\\d+")) {
+            Long empId = Long.valueOf(id);
+            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
+
+            if (employeeOpt.isPresent()) {
+                EmployeeJPA selectedEmployee = employeeOpt.get();
+
+                if(!partialEmployeeJPA.isFirstNameEmpty()) {
+                    selectedEmployee.setFirstName(partialEmployeeJPA.getFirstName());
+                }
+
+                if(!partialEmployeeJPA.isLastNameEmpty()) {
+                    selectedEmployee.setLastName(partialEmployeeJPA.getLastName());
+                }
+
+                if(!partialEmployeeJPA.isAddedDateEmpty()) {
+                    selectedEmployee.setAddedDate(partialEmployeeJPA.getAddedDate());
+                }
+
+                if(!partialEmployeeJPA.isEmploymentStatusEmpty()) {
+                    selectedEmployee.setEmploymentStatus(partialEmployeeJPA.getEmploymentStatus());
+                }
+
+                updatedEmployee = employeeJPARepository.save(selectedEmployee);
+            }
+        }
+
+        return updatedEmployee;
+    }
+
+    private EmployeeMongo updatePartialEmployeeMongo(String id, EmployeeMongo partialEmployeeMongo) {
+        EmployeeMongo updatedEmployee = null;
+
+        if (id.matches("\\d+")) {
+            Long empId = Long.valueOf(id);
+            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
+
+            if (employeeOpt.isPresent()) {
+                EmployeeMongo selectedEmployee = employeeOpt.get();
+
+                if(!partialEmployeeMongo.isFirstNameEmpty()) {
+                    selectedEmployee.setFirstName(partialEmployeeMongo.getFirstName());
+                }
+
+                if(!partialEmployeeMongo.isLastNameEmpty()) {
+                    selectedEmployee.setLastName(partialEmployeeMongo.getLastName());
+                }
+
+                if(!partialEmployeeMongo.isAddedDateEmpty()) {
+                    selectedEmployee.setAddedDate(partialEmployeeMongo.getAddedDate());
+                }
+
+                if(!partialEmployeeMongo.isEmploymentStatusEmpty()) {
+                    selectedEmployee.setEmploymentStatus(partialEmployeeMongo.getEmploymentStatus());
+                }
+
+                if(!partialEmployeeMongo.isDatasourceEmpty()) {
+                    selectedEmployee.setDatasource(partialEmployeeMongo.getDatasource());
+                }
+
+                updatedEmployee = employeeMongoRepository.save(selectedEmployee);
+            }
+        }
+
+        return updatedEmployee;
+    }
+
     private EmployeeJPA getEmployeeJPA(String id) {
         EmployeeJPA selectedEmployee = null;
 
