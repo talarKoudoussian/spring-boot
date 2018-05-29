@@ -4,13 +4,17 @@ import employee.data.EmployeeJPA;
 import employee.data.EmployeeMongo;
 import employee.repository.EmployeeJPARepository;
 import employee.repository.EmployeeMongoRepository;
+import javassist.bytecode.stackmap.TypeData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service("employeeService")
 public class EmployeeServiceImpl implements EmployeeService {
+
 
     @Autowired
     EmployeeJPARepository employeeJPARepository;
@@ -18,17 +22,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     EmployeeMongoRepository employeeMongoRepository;
 
+    private static final Logger LOGGER = Logger.getLogger( TypeData.ClassName.class.getName() );
+
     @Override
     public Object getEmployee(String id, double version) {
         Object returnEmployee;
-        String strVersion = String.valueOf(version);
+        int versionIntNumber = (int) Math.floor(version);
+        LOGGER.log(Level.INFO, "version to call: " + versionIntNumber + " or DEFAULT");
 
-        switch (strVersion) {
-            case "-1" : returnEmployee = null;
+        switch (versionIntNumber) {
+            case 1 : returnEmployee = getEmployeeJPA(id);
                         break;
-            case "1.0" : returnEmployee = getEmployeeJPA(id);
-                        break;
-            case "2.0" : returnEmployee = getEmployeeMongo(id);
+            case 2 : returnEmployee = getEmployeeMongo(id);
                         break;
             default: returnEmployee = getEmployeeMongo(id);
                         break;

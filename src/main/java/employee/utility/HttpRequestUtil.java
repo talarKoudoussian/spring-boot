@@ -1,72 +1,59 @@
 package employee.utility;
 
-import javassist.bytecode.stackmap.TypeData;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class HttpRequestUtil {
 
-    private static final Logger LOGGER = Logger.getLogger( TypeData.ClassName.class.getName() );
+    private boolean isValidVendor(String vendor) {
+        return vendor.equals("vnd.pl.employee") ? true : false;
 
-    public double checkHeader(String contentType) { // application/vnd.pl.employee+json; version=1.0
+    }
 
-        String[] contents = contentType.split("/|;"); // 0. application (ignore) 1. vendor+returnTYpe & 2. version
-        LOGGER.log(Level.INFO, "contents.length: " + contents.length);
-        double returnVal;
+    private boolean isValidVendorType(String vndType) {
+        return vndType.equals("json") ? true : false;
+    }
 
-        String[] vendorType = contents[1].split("\\+"); // 0. vendor 1. returnType
-        if(vendorType.length > 1) {
+    public String getVendor(String contentType) {
+        String[] content = contentType.split("/|\\+");
+        return content[1];
+    }
 
-            if(isValidVendor(vendorType)) {
+    public String getVendorType(String contentType) {
+        String[] content = contentType.split("\\+|;");
+        return content[1];
+    }
 
-                if(isValidReturnType(vendorType)) {
-                    return getVersion(contents);
-                }
+    public double getVersion(String contentType) {
+        double version = -1;
 
-                LOGGER.log(Level.INFO, "Invalid return type");
-                return -1;
-            }
-
-            LOGGER.log(Level.INFO, "Invalid vendor");
-            return -1;
+        if(isVersionSpecified(contentType)) {
+            String[] content = contentType.split(";|=");
+            version = Double.parseDouble(content[2]);
         }
 
-        LOGGER.log(Level.INFO, "No return type specified");
-        return -1;
+        return version;
     }
 
-    private boolean isValidVendor(String[] content) {
-        return content[0].equals("vnd.pl.employee") ? true : false;
+    public boolean isValidHeader(String vnd, String vndType) {
+        boolean isValid = false;
 
-    }
+        if(isValidVendor(vnd)) {
 
-    private boolean isValidReturnType(String[] content) {
-        return content[1].equals("json") ? true : false;
-    }
-
-    private double getVersion(String[] content) {
-        double returnVal;
-        if(content.length >= 3) {
-            String[] version = content[2].split("=");
-
-            if(version.length > 1) {
-                returnVal = Double.parseDouble(version[1]);
-                LOGGER.log(Level.INFO, "version: " + returnVal);
-                returnVal = Math.floor(returnVal);
-                LOGGER.log(Level.INFO, "version to call: " + returnVal + " or DEFAULT");
+            if(isValidVendorType(vndType)) {
+                return true;
             }
-            else {
-                returnVal = 2;
-                LOGGER.log(Level.INFO, "default version(empty): " + returnVal);
-            }
+
         }
-        else {
-            returnVal = 2;
-            LOGGER.log(Level.INFO, "version default: " +  returnVal);
+        
+        return isValid;
+    }
+
+    public boolean isVersionSpecified(String contentType) {
+        boolean isSpecified = false;
+        String[] content = contentType.split("/|\\+|;");
+
+        if(content.length > 3) {
+            isSpecified = true;
         }
 
-        return returnVal;
+        return isSpecified;
     }
-
 }

@@ -5,7 +5,6 @@ import employee.repository.EmployeeJPARepository;
 import employee.repository.EmployeeMongoRepository;
 import employee.service.EmployeeServiceImpl;
 import employee.utility.HttpRequestUtil;
-import javassist.bytecode.stackmap.TypeData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @RestController
 public class EmployeeController {
@@ -29,9 +26,7 @@ public class EmployeeController {
     @Autowired
     EmployeeServiceImpl employeeService;
 
-    HttpRequestUtil employeeUtil = new HttpRequestUtil();
-
-    private static final Logger LOGGER = Logger.getLogger( TypeData.ClassName.class.getName() );
+    HttpRequestUtil headerUtils = new HttpRequestUtil();
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
@@ -51,21 +46,23 @@ public class EmployeeController {
     public ResponseEntity<? extends  Object> getEmployee(@PathVariable("id") String id, HttpServletRequest request) {
 
         String contentType = request.getContentType();
-        LOGGER.log(Level.INFO, contentType);
-        double version = employeeUtil.checkHeader(contentType);
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        double version = headerUtils.getVersion(contentType);
 
-        if(version == -1){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object employee = employeeService.getEmployee(id, version);
+
+            if (employee != null) {
+                return new ResponseEntity<>(employee, HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
         }
 
-        Object employee = employeeService.getEmployee(id, version);
-
-        if (employee != null) {
-            return new ResponseEntity<>(employee, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody
