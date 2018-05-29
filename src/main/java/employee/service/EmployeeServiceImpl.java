@@ -25,11 +25,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         int versionIntNumber = (int) Math.floor(version);
 
         switch (versionIntNumber) {
-            case 1 : {
+            case 1: {
                 returnEmployee = getEmployeeJPA(id);
                 break;
             }
-            case 2 : {
+            case 2: {
                 returnEmployee = getEmployeeMongo(id);
                 break;
             }
@@ -44,11 +44,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private EmployeeJPA getEmployeeJPA(String id) {
 
-        if(id.matches("\\d+")) {
+        if (id.matches("\\d+")) {
             Long empId = Long.valueOf(id);
             Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
 
-            if(employeeOpt.isPresent()) {
+            if (employeeOpt.isPresent()) {
                 return employeeOpt.get();
             }
 
@@ -60,11 +60,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private EmployeeMongo getEmployeeMongo(String id) {
 
-        if(id.matches("\\d+")) {
+        if (id.matches("\\d+")) {
             Long empId = Long.valueOf(id);
             Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
 
-            if(employeeOpt.isPresent()) {
+            if (employeeOpt.isPresent()) {
                 return employeeOpt.get();
             }
 
@@ -74,4 +74,136 @@ public class EmployeeServiceImpl implements EmployeeService {
         return null;
     }
 
+    @Override
+    public Object addEmployee(EmployeeJPA employeeJPA, double version) {
+        Object returnEmployee;
+        int versionIntNumber = (int) Math.floor(version);
+        EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
+        switch (versionIntNumber) {
+            case 1: {
+                returnEmployee = addEmployeeJPA(employeeJPA);
+                break;
+            }
+            case 2: {
+                returnEmployee = addEmployeeMongo(employeeMongo);
+                break;
+            }
+            default: {
+                returnEmployee = addEmployeeMongo(employeeMongo);
+                break;
+            }
+        }
+
+        return returnEmployee;
+    }
+
+    @Override
+    public Object updateEmployee(String id, EmployeeJPA employee, double version) {
+        Object returnEmployee = null;
+        int versionIntNumber = (int) Math.floor(version);
+
+        switch (versionIntNumber) {
+            case 1: {
+                returnEmployee = updateEmployeeJPA(id, employee);
+                break;
+            }
+            case 2: {
+                returnEmployee = updateEmployeeMongo(id, employee);
+                break;
+            }
+            default: {
+                returnEmployee = updateEmployeeMongo(id, employee);
+                break;
+            }
+        }
+
+        return returnEmployee;
+    }
+
+    private EmployeeJPA updateEmployeeJPA(String id, EmployeeJPA employeeJPA) {
+        EmployeeJPA updatedEmployee = null;
+
+        if (id.matches("\\d+")) {
+            Long empId = Long.valueOf(id);
+            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
+
+            if (employeeOpt.isPresent()) {
+
+                if(!(employeeJPA.isFirstNameEmpty() || employeeJPA.isLastNameEmpty() || employeeJPA.isAddedDateEmpty() || employeeJPA.isEmploymentStatusEmpty())) {
+                    EmployeeJPA emp = employeeOpt.get();
+                    emp.setFirstName(employeeJPA.getFirstName());
+                    emp.setLastName(employeeJPA.getLastName());
+                    emp.setAddedDate(employeeJPA.getAddedDate());
+                    emp.setEmploymentStatus(employeeJPA.getEmploymentStatus());
+                    emp.setDatasource(employeeJPA.getDatasource());
+                    updatedEmployee = employeeJPARepository.save(emp);
+                }
+
+            }
+
+        }
+
+        return updatedEmployee;
+    }
+
+
+    private EmployeeMongo updateEmployeeMongo(String id, EmployeeJPA employeeJPA) {
+        EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
+        EmployeeMongo updatedEmployee = null;
+
+        if (id.matches("\\d+")) {
+            Long empId = Long.valueOf(id);
+            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
+
+            if (employeeOpt.isPresent()) {
+
+                if(!(employeeMongo.isFirstNameEmpty() || employeeMongo.isLastNameEmpty() || employeeMongo.isAddedDateEmpty() || employeeMongo.isEmploymentStatusEmpty())) {
+                    EmployeeMongo emp = employeeOpt.get();
+                    emp.setEmployeeId(empId);
+                    emp.setFirstName(employeeMongo.getFirstName());
+                    emp.setLastName(employeeMongo.getLastName());
+                    emp.setAddedDate(employeeMongo.getAddedDate());
+                    emp.setEmploymentStatus(employeeMongo.getEmploymentStatus());
+                    emp.setDatasource(employeeMongo.getDatasource());
+                    updatedEmployee = employeeMongoRepository.save(emp);
+                }
+
+            }
+
+        }
+
+        return updatedEmployee;
+    }
+
+    private EmployeeJPA addEmployeeJPA(EmployeeJPA employeeJPA) {
+        EmployeeJPA addedEmployee = null;
+
+        if(!(employeeJPA.isFirstNameEmpty() || employeeJPA.isLastNameEmpty() || employeeJPA.isAddedDateEmpty() || employeeJPA.isEmploymentStatusEmpty())) {
+            addedEmployee = employeeJPARepository.save(employeeJPA);
+        }
+
+        return addedEmployee;
+    }
+
+    private EmployeeMongo addEmployeeMongo(EmployeeMongo employeeMongo) {
+        EmployeeMongo addedEmployee = null;
+
+        if(!(employeeMongo.isFirstNameEmpty() || employeeMongo.isLastNameEmpty() || employeeMongo.isAddedDateEmpty() || employeeMongo.isEmploymentStatusEmpty())) {
+            addedEmployee = employeeMongoRepository.save(employeeMongo);
+        }
+
+        return addedEmployee;
+    }
+
+
+    private EmployeeMongo toEmployeeMongo(EmployeeJPA employeeJPA) {
+        EmployeeMongo employeeMongo = new EmployeeMongo();
+        employeeMongo.setFirstName(employeeJPA.getFirstName());
+        employeeMongo.setLastName(employeeJPA.getLastName());
+        employeeMongo.setAddedDate(employeeJPA.getAddedDate());
+        employeeMongo.setEmploymentStatus(employeeJPA.getEmploymentStatus());
+        employeeMongo.setDatasource(employeeJPA.getDatasource());
+
+        return employeeMongo;
+    }
 }

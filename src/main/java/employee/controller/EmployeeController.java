@@ -29,16 +29,25 @@ public class EmployeeController {
     HttpRequestUtil headerUtils = new HttpRequestUtil();
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<EmployeeJPA> addEmployee(@RequestBody EmployeeJPA employee) {
+    @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = { "application/vnd.pl.employee+json" })
+    public ResponseEntity<? extends Object> addEmployee(@RequestBody EmployeeJPA employee, HttpServletRequest request) {
         System.out.println(employee.toString());
 
-        if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        String contentType = request.getContentType();
+        System.out.println(contentType);
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        double version = headerUtils.getVersion(contentType);
 
-        EmployeeJPA newEmployee = employeeRepository.save(employee);
-        return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object addedEmployee = employeeService.addEmployee(employee, version    );
+
+            if(employee != null) {
+                return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
+            }
+
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody
@@ -66,30 +75,25 @@ public class EmployeeController {
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<EmployeeJPA> updateEmployee(@PathVariable("id") String employeeId, @RequestBody EmployeeJPA employee) {
-        if(employeeId.matches("\\d+")) {
-            Long id = Long.valueOf(employeeId);
-            Optional<EmployeeJPA> selectedEmployee = employeeRepository.findById(id);
+    @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = { "application/vnd.pl.employee+json"})
+    public ResponseEntity<? extends Object> updateEmployee(@PathVariable("id") String id, @RequestBody EmployeeJPA employee, HttpServletRequest request) {
+        String contentType = request.getContentType();
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        double version = headerUtils.getVersion(contentType);
 
-            if(selectedEmployee.isPresent()) {
-                if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                }
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object updatedEmployee = employeeService.updateEmployee(id, employee, version);
 
-                EmployeeJPA emp = selectedEmployee.get();
-                emp.setFirstName(employee.getFirstName());
-                emp.setLastName(employee.getLastName());
-                emp.setAddedDate(employee.getAddedDate());
-                emp.setEmploymentStatus(employee.getEmploymentStatus());
-                EmployeeJPA updatedEmployee = employeeRepository.save(emp);
+            if (updatedEmployee != null) {
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
