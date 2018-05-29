@@ -26,6 +26,7 @@ public class EmployeeJPA {
     @Column(name="employment_status")
     private Boolean employmentStatus;
 
+    @Column(name="datasource")
     private String datasource;
 
     public Long getEmployeeId() {

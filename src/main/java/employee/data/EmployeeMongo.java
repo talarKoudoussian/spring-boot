@@ -1,6 +1,7 @@
 package employee.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -10,6 +11,8 @@ import javax.persistence.Id;
 public class EmployeeMongo {
 
     @Id
+    private ObjectId _id;
+
     @Field("employeeId")
     private Long employeeId;
 
@@ -94,6 +97,11 @@ public class EmployeeMongo {
     @JsonIgnore
     public boolean isEmploymentStatusEmpty() {
         return employmentStatus == null;
+    }
+
+    @JsonIgnore
+    public boolean isDatasourceEmpty() {
+        return datasource == null;
     }
 
     @Override

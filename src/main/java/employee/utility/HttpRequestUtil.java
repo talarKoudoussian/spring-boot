@@ -20,12 +20,12 @@ public class HttpRequestUtil {
         return content[1];
     }
 
-    public double getVersion(String contentType) {
-        double version = -1;
+    public int getVersion(String contentType) {
+        int version = -1;
 
         if(isVersionSpecified(contentType)) {
             String[] content = contentType.split(";|=");
-            version = Double.parseDouble(content[2]);
+            version = Integer.parseInt(content[2]);
         }
 
         return version;
@@ -39,7 +39,6 @@ public class HttpRequestUtil {
             if(isValidVendorType(vndType)) {
                 return true;
             }
-
         }
 
         return isValid;

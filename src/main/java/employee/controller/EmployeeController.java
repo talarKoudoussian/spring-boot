@@ -7,12 +7,10 @@ import employee.service.EmployeeServiceImpl;
 import employee.utility.HttpRequestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @RestController
 public class EmployeeController {
@@ -29,16 +27,21 @@ public class EmployeeController {
     HttpRequestUtil headerUtils = new HttpRequestUtil();
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<EmployeeJPA> addEmployee(@RequestBody EmployeeJPA employee) {
-        System.out.println(employee.toString());
+    @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = { "application/vnd.pl.employee+json" })
+    public ResponseEntity<? extends Object> addEmployee(@RequestBody EmployeeJPA employee, HttpServletRequest request) {
+        String contentType = request.getContentType();
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        int version = headerUtils.getVersion(contentType);
 
-        if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object addedEmployee = employeeService.addEmployee(employee, version);
+
+            if(addedEmployee != null) {
+                return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
+            }
         }
-
-        EmployeeJPA newEmployee = employeeRepository.save(employee);
-        return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody
@@ -48,7 +51,7 @@ public class EmployeeController {
         String contentType = request.getContentType();
         String vnd = headerUtils.getVendor(contentType);
         String vndType = headerUtils.getVendorType(contentType);
-        double version = headerUtils.getVersion(contentType);
+        int version = headerUtils.getVersion(contentType);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object employee = employeeService.getEmployee(id, version);
@@ -59,89 +62,73 @@ public class EmployeeController {
             else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<EmployeeJPA> updateEmployee(@PathVariable("id") String employeeId, @RequestBody EmployeeJPA employee) {
-        if(employeeId.matches("\\d+")) {
-            Long id = Long.valueOf(employeeId);
-            Optional<EmployeeJPA> selectedEmployee = employeeRepository.findById(id);
+    @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = { "application/vnd.pl.employee+json"})
+    public ResponseEntity<? extends Object> updateEmployee(@PathVariable("id") String id, @RequestBody EmployeeJPA employee, HttpServletRequest request) {
+        String contentType = request.getContentType();
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        int version = headerUtils.getVersion(contentType);
 
-            if(selectedEmployee.isPresent()) {
-                if(employee.isFirstNameEmpty() || employee.isLastNameEmpty() || employee.isAddedDateEmpty() || employee.isEmploymentStatusEmpty()){
-                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-                }
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object updatedEmployee = employeeService.updateEmployee(id, employee, version);
 
-                EmployeeJPA emp = selectedEmployee.get();
-                emp.setFirstName(employee.getFirstName());
-                emp.setLastName(employee.getLastName());
-                emp.setAddedDate(employee.getAddedDate());
-                emp.setEmploymentStatus(employee.getEmploymentStatus());
-                EmployeeJPA updatedEmployee = employeeRepository.save(emp);
+            if (updatedEmployee != null) {
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
-
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") String employeeId) {
-        if(employeeId.matches("\\d+")){
-            Long id = Long.valueOf(employeeId);
-
-            if(employeeRepository.existsById(id)) {
-                employeeRepository.deleteById(id);
-                return new ResponseEntity<>(HttpStatus.OK);
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = { "application/vnd.pl.employee+json"})
+    public ResponseEntity<? extends Object> deleteEmployee(@PathVariable("id") String id, HttpServletRequest request) {
+        String contentType = request.getContentType();
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        int version = headerUtils.getVersion(contentType);
+
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object deletedEmployee = employeeService.deleteEmployee(id, version);
+
+            if(deletedEmployee != null) {
+                return new ResponseEntity<>(deletedEmployee, HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/json;charset=UTF-8", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<EmployeeJPA> updatePartialEmployee(@PathVariable("id") String employeeId, @RequestBody EmployeeJPA partialEmployee) {
-        if (employeeId.matches("\\d+")) {
-            Long id = Long.valueOf(employeeId);
-            Optional<EmployeeJPA> selectedEmployee = employeeRepository.findById(id);
+    @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = { "application/vnd.pl.employee+json" })
+    public ResponseEntity<? extends Object> updatePartialEmployee(@PathVariable("id") String id, @RequestBody EmployeeJPA partialEmployee, HttpServletRequest request) {
+        String contentType = request.getContentType();
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        int version = headerUtils.getVersion(contentType);
 
-            if(selectedEmployee.isPresent()) {
-                EmployeeJPA emp = selectedEmployee.get();
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object updatedEmployee = employeeService.updatePartialEmployee(id, partialEmployee, version);
 
-                if(!partialEmployee.isFirstNameEmpty()) {
-                    emp.setFirstName(partialEmployee.getFirstName());
-                }
-
-                if(!partialEmployee.isLastNameEmpty()) {
-                    emp.setLastName(partialEmployee.getLastName());
-                }
-
-                if(!partialEmployee.isAddedDateEmpty()) {
-                    emp.setAddedDate(partialEmployee.getAddedDate());
-                }
-
-                if(!partialEmployee.isEmploymentStatusEmpty()) {
-                    emp.setEmploymentStatus(partialEmployee.getEmploymentStatus());
-                }
-
-                EmployeeJPA updatedEmployee = employeeRepository.save(emp);
+            if (updatedEmployee != null) {
                 return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
             }
-
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }
-
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 }
