@@ -4,7 +4,6 @@ public class HttpRequestUtil {
 
     private boolean isValidVendor(String vendor) {
         return vendor.equals("vnd.pl.employee") ? true : false;
-
     }
 
     private boolean isValidVendorType(String vndType) {
@@ -42,11 +41,11 @@ public class HttpRequestUtil {
             }
 
         }
-        
+
         return isValid;
     }
 
-    public boolean isVersionSpecified(String contentType) {
+    private boolean isVersionSpecified(String contentType) {
         boolean isSpecified = false;
         String[] content = contentType.split("/|\\+|;");
 
