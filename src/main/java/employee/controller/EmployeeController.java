@@ -5,7 +5,6 @@ import employee.repository.EmployeeJPARepository;
 import employee.repository.EmployeeMongoRepository;
 import employee.service.EmployeeServiceImpl;
 import employee.utility.HttpRequestUtil;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,7 +37,7 @@ public class EmployeeController {
         System.out.println(contentType);
         String vnd = headerUtils.getVendor(contentType);
         String vndType = headerUtils.getVendorType(contentType);
-        double version = headerUtils.getVersion(contentType);
+        int version = headerUtils.getVersion(contentType);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object addedEmployee = employeeService.addEmployee(employee, version);
@@ -58,7 +57,7 @@ public class EmployeeController {
         String contentType = request.getContentType();
         String vnd = headerUtils.getVendor(contentType);
         String vndType = headerUtils.getVendorType(contentType);
-        double version = headerUtils.getVersion(contentType);
+        int version = headerUtils.getVersion(contentType);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object employee = employeeService.getEmployee(id, version);
@@ -81,7 +80,7 @@ public class EmployeeController {
         String contentType = request.getContentType();
         String vnd = headerUtils.getVendor(contentType);
         String vndType = headerUtils.getVendorType(contentType);
-        double version = headerUtils.getVersion(contentType);
+        int version = headerUtils.getVersion(contentType);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object updatedEmployee = employeeService.updateEmployee(id, employee, version);
@@ -102,7 +101,7 @@ public class EmployeeController {
         String contentType = request.getContentType();
         String vnd = headerUtils.getVendor(contentType);
         String vndType = headerUtils.getVendorType(contentType);
-        double version = headerUtils.getVersion(contentType);
+        int version = headerUtils.getVersion(contentType);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object deletedEmployee = employeeService.deleteEmployee(id, version);

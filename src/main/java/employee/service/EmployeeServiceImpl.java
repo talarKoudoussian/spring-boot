@@ -20,10 +20,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeMongoRepository employeeMongoRepository;
 
     @Override
-    public Object getEmployee(String id, double version) {
+    public Object getEmployee(String id, int version) {
         Object returnEmployee = null;
 
-        switch ((int) version) {
+        switch (version) {
             case 1: {
                 returnEmployee = getEmployeeJPA(id);
                 break;
@@ -74,10 +74,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Object addEmployee(EmployeeJPA employeeJPA, double version) {
+    public Object addEmployee(EmployeeJPA employeeJPA, int version) {
         Object addedEmployee = null;
-        int versionIntNumber = (int) Math.floor(version);
-        switch (versionIntNumber) {
+        switch (version) {
             case 1: {
                 addedEmployee = addEmployeeJPA(employeeJPA);
                 break;
@@ -95,11 +94,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Object updateEmployee(String id, EmployeeJPA employee, double version) {
+    public Object updateEmployee(String id, EmployeeJPA employee, int version) {
         Object returnEmployee = null;
-        int versionIntNumber = (int) Math.floor(version);
 
-        switch (versionIntNumber) {
+        switch (version) {
             case 1: {
                 returnEmployee = updateEmployeeJPA(id, employee);
                 break;
@@ -118,11 +116,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Object deleteEmployee(String id, double version) {
+    public Object deleteEmployee(String id, int version) {
         Object deletedEmployee = null;
-        int versionIntNumber = (int) Math.floor(version);
 
-        switch (versionIntNumber) {
+        switch (version) {
             case 1: {
                 deletedEmployee = deleteEmployeeJPA(id);
                 break;
