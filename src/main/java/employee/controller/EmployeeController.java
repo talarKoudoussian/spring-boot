@@ -5,6 +5,7 @@ import employee.repository.EmployeeJPARepository;
 import employee.repository.EmployeeMongoRepository;
 import employee.service.EmployeeServiceImpl;
 import employee.utility.HttpRequestUtil;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,9 +41,9 @@ public class EmployeeController {
         double version = headerUtils.getVersion(contentType);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
-            Object addedEmployee = employeeService.addEmployee(employee, version    );
+            Object addedEmployee = employeeService.addEmployee(employee, version);
 
-            if(employee != null) {
+            if(addedEmployee != null) {
                 return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
             }
 
@@ -97,19 +98,24 @@ public class EmployeeController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") String employeeId) {
-        if(employeeId.matches("\\d+")){
-            Long id = Long.valueOf(employeeId);
+    public ResponseEntity<? extends Object> deleteEmployee(@PathVariable("id") String id, HttpServletRequest request) {
+        String contentType = request.getContentType();
+        String vnd = headerUtils.getVendor(contentType);
+        String vndType = headerUtils.getVendorType(contentType);
+        double version = headerUtils.getVersion(contentType);
 
-            if(employeeRepository.existsById(id)) {
-                employeeRepository.deleteById(id);
-                return new ResponseEntity<>(HttpStatus.OK);
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            Object deletedEmployee = employeeService.deleteEmployee(id, version);
+
+            if(deletedEmployee != null) {
+                return new ResponseEntity<>(deletedEmployee, HttpStatus.OK);
             }
-
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ResponseBody

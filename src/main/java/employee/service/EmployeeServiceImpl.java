@@ -21,10 +21,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Object getEmployee(String id, double version) {
-        Object returnEmployee;
-        int versionIntNumber = (int) Math.floor(version);
+        Object returnEmployee = null;
 
-        switch (versionIntNumber) {
+        switch ((int) version) {
             case 1: {
                 returnEmployee = getEmployeeJPA(id);
                 break;
@@ -76,25 +75,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Object addEmployee(EmployeeJPA employeeJPA, double version) {
-        Object returnEmployee;
+        Object addedEmployee = null;
         int versionIntNumber = (int) Math.floor(version);
-        EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
         switch (versionIntNumber) {
             case 1: {
-                returnEmployee = addEmployeeJPA(employeeJPA);
+                addedEmployee = addEmployeeJPA(employeeJPA);
                 break;
             }
-            case 2: {
-                returnEmployee = addEmployeeMongo(employeeMongo);
-                break;
-            }
+
+            case 2:
             default: {
-                returnEmployee = addEmployeeMongo(employeeMongo);
+                EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
+                addedEmployee = addEmployeeMongo(employeeMongo);
                 break;
             }
         }
 
-        return returnEmployee;
+        return addedEmployee;
     }
 
     @Override
@@ -120,6 +117,61 @@ public class EmployeeServiceImpl implements EmployeeService {
         return returnEmployee;
     }
 
+    @Override
+    public Object deleteEmployee(String id, double version) {
+        Object deletedEmployee = null;
+        int versionIntNumber = (int) Math.floor(version);
+
+        switch (versionIntNumber) {
+            case 1: {
+                deletedEmployee = deleteEmployeeJPA(id);
+                break;
+            }
+            case 2: {
+                deletedEmployee = deleteEmployeeMongo(id);
+                break;
+            }
+            default: {
+                deletedEmployee = deleteEmployeeMongo(id);
+                break;
+            }
+        }
+
+        return deletedEmployee;
+    }
+
+    private EmployeeMongo deleteEmployeeMongo(String id) {
+        EmployeeMongo deletedEmployee = null;
+
+        if(id.matches("\\d+")){
+            Long empId = Long.valueOf(id);
+            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
+
+            if(employeeOpt.isPresent()) {
+                employeeMongoRepository.deleteByEmployeeId(empId);
+                deletedEmployee = employeeOpt.get();
+            }
+        }
+
+        return deletedEmployee;
+    }
+
+    private EmployeeJPA deleteEmployeeJPA(String id) {
+        EmployeeJPA deletedEmployee = null;
+
+        if(id.matches("\\d+")){
+            Long empId = Long.valueOf(id);
+            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
+
+            if(employeeOpt.isPresent()) {
+                employeeJPARepository.deleteById(empId);
+                deletedEmployee = employeeOpt.get();
+            }
+        }
+
+        return deletedEmployee;
+    }
+
     private EmployeeJPA updateEmployeeJPA(String id, EmployeeJPA employeeJPA) {
         EmployeeJPA updatedEmployee = null;
 
@@ -138,14 +190,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                     emp.setDatasource(employeeJPA.getDatasource());
                     updatedEmployee = employeeJPARepository.save(emp);
                 }
-
             }
-
         }
 
         return updatedEmployee;
     }
-
 
     private EmployeeMongo updateEmployeeMongo(String id, EmployeeJPA employeeJPA) {
         EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
@@ -167,9 +216,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     emp.setDatasource(employeeMongo.getDatasource());
                     updatedEmployee = employeeMongoRepository.save(emp);
                 }
-
             }
-
         }
 
         return updatedEmployee;
