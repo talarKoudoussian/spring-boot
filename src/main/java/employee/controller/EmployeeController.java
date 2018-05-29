@@ -31,10 +31,7 @@ public class EmployeeController {
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = { "application/vnd.pl.employee+json" })
     public ResponseEntity<? extends Object> addEmployee(@RequestBody EmployeeJPA employee, HttpServletRequest request) {
-        System.out.println(employee.toString());
-
         String contentType = request.getContentType();
-        System.out.println(contentType);
         String vnd = headerUtils.getVendor(contentType);
         String vndType = headerUtils.getVendorType(contentType);
         int version = headerUtils.getVersion(contentType);
@@ -45,7 +42,6 @@ public class EmployeeController {
             if(addedEmployee != null) {
                 return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
             }
-
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -68,7 +64,6 @@ public class EmployeeController {
             else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
