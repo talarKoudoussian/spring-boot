@@ -39,7 +39,6 @@ public class HttpRequestUtil {
             if(isValidVendorType(vndType)) {
                 return true;
             }
-
         }
 
         return isValid;
