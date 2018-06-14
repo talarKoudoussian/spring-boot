@@ -27,12 +27,12 @@ public class EmployeeController {
     HttpRequestUtil headerUtils = new HttpRequestUtil();
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = { "application/vnd.pl.employee+json" })
+    @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> addEmployee(@RequestBody EmployeeJPA employee, HttpServletRequest request) {
-        String contentType = request.getContentType();
-        String vnd = headerUtils.getVendor(contentType);
-        String vndType = headerUtils.getVendorType(contentType);
-        int version = headerUtils.getVersion(contentType);
+        String acceptHeader = request.getHeader("Accept");
+        String vnd = headerUtils.getVendor(acceptHeader);
+        String vndType = headerUtils.getVendorType(acceptHeader);
+        int version = headerUtils.getVersion(acceptHeader);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object addedEmployee = employeeService.addEmployee(employee, version);
@@ -45,13 +45,13 @@ public class EmployeeController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = { "application/vnd.pl.employee+json"})
+    @RequestMapping(value = "/employees/{id}", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends  Object> getEmployee(@PathVariable("id") String id, HttpServletRequest request) {
 
-        String contentType = request.getContentType();
-        String vnd = headerUtils.getVendor(contentType);
-        String vndType = headerUtils.getVendorType(contentType);
-        int version = headerUtils.getVersion(contentType);
+        String acceptHeader = request.getHeader("Accept");
+        String vnd = headerUtils.getVendor(acceptHeader);
+        String vndType = headerUtils.getVendorType(acceptHeader);
+        int version = headerUtils.getVersion(acceptHeader);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object employee = employeeService.getEmployee(id, version);
@@ -68,12 +68,12 @@ public class EmployeeController {
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = { "application/vnd.pl.employee+json"})
+    @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> updateEmployee(@PathVariable("id") String id, @RequestBody EmployeeJPA employee, HttpServletRequest request) {
-        String contentType = request.getContentType();
-        String vnd = headerUtils.getVendor(contentType);
-        String vndType = headerUtils.getVendorType(contentType);
-        int version = headerUtils.getVersion(contentType);
+        String acceptHeader = request.getHeader("Accept");
+        String vnd = headerUtils.getVendor(acceptHeader);
+        String vndType = headerUtils.getVendorType(acceptHeader);
+        int version = headerUtils.getVersion(acceptHeader);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object updatedEmployee = employeeService.updateEmployee(id, employee, version);
@@ -89,12 +89,12 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = { "application/vnd.pl.employee+json"})
+    @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> deleteEmployee(@PathVariable("id") String id, HttpServletRequest request) {
-        String contentType = request.getContentType();
-        String vnd = headerUtils.getVendor(contentType);
-        String vndType = headerUtils.getVendorType(contentType);
-        int version = headerUtils.getVersion(contentType);
+        String acceptHeader = request.getHeader("Accept");
+        String vnd = headerUtils.getVendor(acceptHeader);
+        String vndType = headerUtils.getVendorType(acceptHeader);
+        int version = headerUtils.getVersion(acceptHeader);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object deletedEmployee = employeeService.deleteEmployee(id, version);
@@ -111,12 +111,12 @@ public class EmployeeController {
     }
 
     @ResponseBody
-    @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = { "application/vnd.pl.employee+json" })
+    @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> updatePartialEmployee(@PathVariable("id") String id, @RequestBody EmployeeJPA partialEmployee, HttpServletRequest request) {
-        String contentType = request.getContentType();
-        String vnd = headerUtils.getVendor(contentType);
-        String vndType = headerUtils.getVendorType(contentType);
-        int version = headerUtils.getVersion(contentType);
+        String acceptHeader = request.getHeader("Accept");
+        String vnd = headerUtils.getVendor(acceptHeader);
+        String vndType = headerUtils.getVendorType(acceptHeader);
+        int version = headerUtils.getVersion(acceptHeader);
 
         if(headerUtils.isValidHeader(vnd, vndType)) {
             Object updatedEmployee = employeeService.updatePartialEmployee(id, partialEmployee, version);
