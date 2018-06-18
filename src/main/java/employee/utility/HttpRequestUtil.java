@@ -10,22 +10,22 @@ public class HttpRequestUtil {
         return vndType.equals("json") ? true : false;
     }
 
-    public String getVendor(String contentType) {
-        String[] content = contentType.split("/|\\+");
-        return content[1];
+    public String getVendor(String acceptHeader) {
+        String[] header = acceptHeader.split("/|\\+");
+        return header[1];
     }
 
-    public String getVendorType(String contentType) {
-        String[] content = contentType.split("\\+|;");
-        return content[1];
+    public String getVendorType(String acceptHeader) {
+        String[] header = acceptHeader.split("\\+|;");
+        return header[1];
     }
 
-    public int getVersion(String contentType) {
+    public int getVersion(String acceptHeader) {
         int version = -1;
 
-        if(isVersionSpecified(contentType)) {
-            String[] content = contentType.split(";|=");
-            version = Integer.parseInt(content[2]);
+        if(isVersionSpecified(acceptHeader)) {
+            String[] header = acceptHeader.split(";|=");
+            version = Integer.parseInt(header[2]);
         }
 
         return version;
@@ -44,11 +44,11 @@ public class HttpRequestUtil {
         return isValid;
     }
 
-    private boolean isVersionSpecified(String contentType) {
+    private boolean isVersionSpecified(String acceptHeader) {
         boolean isSpecified = false;
-        String[] content = contentType.split("/|\\+|;");
+        String[] header = acceptHeader.split("/|\\+|;");
 
-        if(content.length > 3) {
+        if(header.length > 3) {
             isSpecified = true;
         }
 
