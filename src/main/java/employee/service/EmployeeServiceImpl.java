@@ -7,6 +7,8 @@ import employee.repository.EmployeeMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service("employeeService")
@@ -35,6 +37,31 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return returnEmployee;
+    }
+
+    @Override
+    public List<Object> getAllEmployees(int version) {
+        List<Object> employeesList = new ArrayList<>();
+
+        switch (version) {
+            case 1: {
+                List<EmployeeJPA> employeesJPA = getAllEmployeesJPA();
+                for (EmployeeJPA employee: employeesJPA) {
+                    employeesList.add(employee);
+                }
+                break;
+            }
+            case 2:
+            default: {
+                List<EmployeeMongo> employeesMongo = getAllEmployeesMongo();
+                for (EmployeeMongo employee: employeesMongo) {
+                    employeesList.add(employee);
+                }
+                break;
+            }
+        }
+
+        return employeesList;
     }
 
     @Override
@@ -114,6 +141,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return updatedEmployee;
+    }
+
+    private List<EmployeeJPA> getAllEmployeesJPA() {
+        List<EmployeeJPA> employees =  new ArrayList<>();
+
+        Iterable<EmployeeJPA> allEmployees = employeeJPARepository.findAll();
+        allEmployees.forEach(employees::add);
+
+        return employees;
+    }
+
+    private List<EmployeeMongo> getAllEmployeesMongo() {
+        List<EmployeeMongo> employees = employeeMongoRepository.findAll();
+        return employees;
     }
 
     private EmployeeJPA updatePartialEmployeeJPA(String id, EmployeeJPA partialEmployeeJPA) {
