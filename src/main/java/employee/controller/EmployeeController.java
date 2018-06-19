@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 public class EmployeeController {
@@ -41,6 +42,29 @@ public class EmployeeController {
                 return new ResponseEntity<>(addedEmployee, HttpStatus.CREATED);
             }
         }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/employees", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json")
+    public ResponseEntity<List<? extends  Object>> getAllEmployees(HttpServletRequest request) {
+
+        String acceptHeader = request.getHeader("Accept");
+        String vnd = headerUtils.getVendor(acceptHeader);
+        String vndType = headerUtils.getVendorType(acceptHeader);
+        int version = headerUtils.getVersion(acceptHeader);
+
+        if(headerUtils.isValidHeader(vnd, vndType)) {
+            List<Object> employees = employeeService.getAllEmployees(version);
+
+            if (employees != null) {
+                return new ResponseEntity<>(employees, HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
