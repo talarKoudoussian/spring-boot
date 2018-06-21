@@ -27,6 +27,7 @@ public class EmployeeController {
 
     HttpRequestUtil headerUtils = new HttpRequestUtil();
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(method = RequestMethod.POST, value = "/employees", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> addEmployee(@RequestBody EmployeeJPA employee, HttpServletRequest request) {
