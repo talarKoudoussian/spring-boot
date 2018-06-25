@@ -92,6 +92,7 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(method = RequestMethod.PUT, value = "/employees/{id}", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> updateEmployee(@PathVariable("id") String id, @RequestBody EmployeeJPA employee, HttpServletRequest request) {
@@ -114,6 +115,8 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
+    @ResponseBody
     @RequestMapping(method = RequestMethod.DELETE, value = "/employees/{id}", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> deleteEmployee(@PathVariable("id") String id, HttpServletRequest request) {
         String acceptHeader = request.getHeader("Accept");
@@ -135,6 +138,7 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(method = RequestMethod.PATCH, value = "employees/{id}", produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends Object> updatePartialEmployee(@PathVariable("id") String id, @RequestBody EmployeeJPA partialEmployee, HttpServletRequest request) {
