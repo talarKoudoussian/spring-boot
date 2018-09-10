@@ -9,5 +9,7 @@ import java.util.Optional;
 @RepositoryRestResource(collectionResourceRel = "employees")
 public interface EmployeeMongoRepository extends MongoRepository<EmployeeMongo, Long> {
     Optional<EmployeeMongo> findByEmployeeId(Long employeeId);
+    Optional<EmployeeMongo> findBy_id(String employeeId);
+    void deleteBy_id(String employeeId);
     void deleteByEmployeeId(Long employeeId);
 }
