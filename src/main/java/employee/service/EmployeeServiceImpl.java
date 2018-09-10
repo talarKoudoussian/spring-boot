@@ -4,6 +4,7 @@ import employee.data.EmployeeJPA;
 import employee.data.EmployeeMongo;
 import employee.repository.EmployeeJPARepository;
 import employee.repository.EmployeeMongoRepository;
+import employee.utility.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -153,7 +154,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private List<EmployeeMongo> getAllEmployeesMongo() {
-        List<EmployeeMongo> employees = employeeMongoRepository.findAll();
+            List<EmployeeMongo> employees = employeeMongoRepository.findAll();
         return employees;
     }
 
@@ -175,10 +176,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                     selectedEmployee.setLastName(partialEmployeeJPA.getLastName());
                 }
 
-                if(!partialEmployeeJPA.isAddedDateEmpty()) {
-                    selectedEmployee.setAddedDate(partialEmployeeJPA.getAddedDate());
-                }
-
                 if(!partialEmployeeJPA.isEmploymentStatusEmpty()) {
                     selectedEmployee.setEmploymentStatus(partialEmployeeJPA.getEmploymentStatus());
                 }
@@ -193,9 +190,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMongo updatePartialEmployeeMongo(String id, EmployeeMongo partialEmployeeMongo) {
         EmployeeMongo updatedEmployee = null;
 
-        if (id.matches("\\d+")) {
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
+        if (id.matches("^[a-zA-Z0-9_.-]*$")) {
+            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findBy_id(id);
 
             if (employeeOpt.isPresent()) {
                 EmployeeMongo selectedEmployee = employeeOpt.get();
@@ -208,16 +204,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                     selectedEmployee.setLastName(partialEmployeeMongo.getLastName());
                 }
 
-                if(!partialEmployeeMongo.isAddedDateEmpty()) {
-                    selectedEmployee.setAddedDate(partialEmployeeMongo.getAddedDate());
-                }
-
                 if(!partialEmployeeMongo.isEmploymentStatusEmpty()) {
                     selectedEmployee.setEmploymentStatus(partialEmployeeMongo.getEmploymentStatus());
-                }
-
-                if(!partialEmployeeMongo.isDatasourceEmpty()) {
-                    selectedEmployee.setDatasource(partialEmployeeMongo.getDatasource());
                 }
 
                 updatedEmployee = employeeMongoRepository.save(selectedEmployee);
@@ -245,9 +233,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMongo getEmployeeMongo(String id) {
         EmployeeMongo selectedEmployee = null;
 
-        if (id.matches("\\d+")) {
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
+        if (id.matches("^[a-zA-Z0-9_.-]*$")) {
+            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findBy_id(id);
 
             if (employeeOpt.isPresent()) {
                 selectedEmployee = employeeOpt.get();
@@ -260,12 +247,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMongo deleteEmployeeMongo(String id) {
         EmployeeMongo deletedEmployee = null;
 
-        if(id.matches("\\d+")){
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
+        if(id.matches("^[a-zA-Z0-9_.-]*$")){
+            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findBy_id(id);
 
             if(employeeOpt.isPresent()) {
-                employeeMongoRepository.deleteByEmployeeId(empId);
+                employeeMongoRepository.deleteBy_id(id);
                 deletedEmployee = employeeOpt.get();
             }
         }
@@ -298,13 +284,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             if (employeeOpt.isPresent()) {
 
-                if(!(employeeJPA.isFirstNameEmpty() || employeeJPA.isLastNameEmpty() || employeeJPA.isAddedDateEmpty() || employeeJPA.isEmploymentStatusEmpty())) {
+                if(!(employeeJPA.isFirstNameEmpty() || employeeJPA.isLastNameEmpty() || employeeJPA.isEmploymentStatusEmpty())) {
                     EmployeeJPA emp = employeeOpt.get();
                     emp.setFirstName(employeeJPA.getFirstName());
                     emp.setLastName(employeeJPA.getLastName());
-                    emp.setAddedDate(employeeJPA.getAddedDate());
                     emp.setEmploymentStatus(employeeJPA.getEmploymentStatus());
-                    emp.setDatasource(employeeJPA.getDatasource());
                     updatedEmployee = employeeJPARepository.save(emp);
                 }
             }
@@ -317,20 +301,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
         EmployeeMongo updatedEmployee = null;
 
-        if (id.matches("\\d+")) {
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findByEmployeeId(empId);
+        if (id.matches("^[a-zA-Z0-9_.-]*$")) {
+            Optional<EmployeeMongo> employeeOpt = employeeMongoRepository.findBy_id(id);
 
             if (employeeOpt.isPresent()) {
 
-                if(!(employeeMongo.isFirstNameEmpty() || employeeMongo.isLastNameEmpty() || employeeMongo.isAddedDateEmpty() || employeeMongo.isEmploymentStatusEmpty())) {
+                if(!(employeeMongo.isFirstNameEmpty() || employeeMongo.isLastNameEmpty() || employeeMongo.isEmploymentStatusEmpty())) {
                     EmployeeMongo emp = employeeOpt.get();
-                    emp.setEmployeeId(empId);
                     emp.setFirstName(employeeMongo.getFirstName());
                     emp.setLastName(employeeMongo.getLastName());
-                    emp.setAddedDate(employeeMongo.getAddedDate());
                     emp.setEmploymentStatus(employeeMongo.getEmploymentStatus());
-                    emp.setDatasource(employeeMongo.getDatasource());
                     updatedEmployee = employeeMongoRepository.save(emp);
                 }
             }
@@ -340,6 +320,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private EmployeeJPA addEmployeeJPA(EmployeeJPA employeeJPA) {
+        String dateNow = new Date().dateNowToIso();
+        employeeJPA.setAddedDate(dateNow);
+        employeeJPA.setDatasource("MariaDB");
+
         EmployeeJPA addedEmployee = null;
 
         if(!(employeeJPA.isFirstNameEmpty() || employeeJPA.isLastNameEmpty() || employeeJPA.isAddedDateEmpty() || employeeJPA.isEmploymentStatusEmpty())) {
@@ -350,6 +334,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private EmployeeMongo addEmployeeMongo(EmployeeMongo employeeMongo) {
+        String dateNow = new Date().dateNowToIso();
+        employeeMongo.setAddedDate(dateNow);
+        employeeMongo.setDatasource("MongoDB");
+
         EmployeeMongo addedEmployee = null;
 
         if(!(employeeMongo.isFirstNameEmpty() || employeeMongo.isLastNameEmpty() || employeeMongo.isAddedDateEmpty() || employeeMongo.isEmploymentStatusEmpty())) {
