@@ -154,7 +154,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private List<EmployeeMongo> getAllEmployeesMongo() {
-            List<EmployeeMongo> employees = employeeMongoRepository.findAll();
+        List<EmployeeMongo> employees = employeeMongoRepository.findAll();
         return employees;
     }
 
