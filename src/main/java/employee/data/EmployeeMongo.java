@@ -1,7 +1,6 @@
 package employee.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -11,10 +10,7 @@ import javax.persistence.Id;
 public class EmployeeMongo {
 
     @Id
-    private ObjectId _id;
-
-    @Field("employeeId")
-    private Long employeeId;
+    private String _id;
 
     @Field("firstName")
     private String firstName;
@@ -31,12 +27,12 @@ public class EmployeeMongo {
     @Field("datasource")
     private String datasource;
 
-    public Long getEmployeeId() {
-        return employeeId;
+    public String getEmployeeId() {
+        return _id;
     }
 
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
+    public void setEmployeeId(String employeeId) {
+        this._id = employeeId;
     }
 
     public String getFirstName() {
@@ -107,7 +103,9 @@ public class EmployeeMongo {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Employee[firstName: ");
+        sb.append("Employee[id: ");
+        sb.append(_id);
+        sb.append(", firstName: ");
         sb.append(firstName);
         sb.append(", lastName: ");
         sb.append(lastName);
