@@ -47,7 +47,11 @@ public class EmployeeJPA {
 
     @JsonIgnore
     public boolean isFirstNameEmpty() {
-        return firstName == null;
+        if(firstName == null || firstName == "") {
+            return true;
+        }
+
+        return false;
     }
 
     public String getLastName() {
@@ -60,7 +64,11 @@ public class EmployeeJPA {
 
     @JsonIgnore
     public boolean isLastNameEmpty() {
-        return lastName == null;
+        if(lastName == null || lastName == "") {
+            return true;
+        }
+
+        return false;
     }
 
     public String getAddedDate() {
@@ -73,7 +81,11 @@ public class EmployeeJPA {
 
     @JsonIgnore
     public boolean isAddedDateEmpty() {
-        return addedDate == null;
+        if(addedDate == null || addedDate == "") {
+            return true;
+        }
+
+        return false;
     }
 
     public Boolean getEmploymentStatus() {
@@ -97,6 +109,15 @@ public class EmployeeJPA {
         return employmentStatus == null;
     }
 
+    @JsonIgnore
+    public boolean isDatasourceEmpty() {
+        if(datasource == null || datasource == "") {
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
@@ -108,6 +129,8 @@ public class EmployeeJPA {
         sb.append(addedDate);
         sb.append(", employmentStatus: ");
         sb.append(employmentStatus);
+        sb.append(", datasource: ");
+        sb.append(datasource);
         sb.append("]");
         return sb.toString();
     }
