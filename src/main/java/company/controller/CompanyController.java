@@ -32,7 +32,7 @@ public class CompanyController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             List<Object> companies = companyService.getAllCompanies(version);
 
             if (companies != null) {
@@ -54,7 +54,7 @@ public class CompanyController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)){
+        if(headerUtils.isValidHeader(vndType)){
             Object company = companyService.getCompany(id, version);
 
             if(company != null){
@@ -74,7 +74,7 @@ public class CompanyController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object addedCompany = companyService.addCompany(company, version);
 
             if(addedCompany != null){
@@ -93,7 +93,7 @@ public class CompanyController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object updatedCompany = companyService.updateCompany(id, company, version);
 
             if(updatedCompany != null) {
@@ -114,7 +114,7 @@ public class CompanyController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object updatedCompany = companyService.updatePartialCompany(id, company, version);
 
             if(updatedCompany != null) {
@@ -134,7 +134,7 @@ public class CompanyController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             boolean isCompanyDeleted = companyService.deleteCompany(id, version);
 
             if(isCompanyDeleted) {

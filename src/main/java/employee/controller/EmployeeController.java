@@ -36,7 +36,7 @@ public class EmployeeController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object addedEmployee = employeeService.addEmployee(employee, version);
 
             if(addedEmployee != null) {
@@ -55,7 +55,7 @@ public class EmployeeController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             List<Object> employees = employeeService.getAllEmployees(version);
 
             if (employees != null) {
@@ -78,7 +78,7 @@ public class EmployeeController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object employee = employeeService.getEmployee(id, version);
 
             if (employee != null) {
@@ -101,7 +101,7 @@ public class EmployeeController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object updatedEmployee = employeeService.updateEmployee(id, employee, version);
 
             if (updatedEmployee != null) {
@@ -124,7 +124,7 @@ public class EmployeeController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object deletedEmployee = employeeService.deleteEmployee(id, version);
 
             if(deletedEmployee != null) {
@@ -147,7 +147,7 @@ public class EmployeeController {
         String vndType = headerUtils.getVendorType(acceptHeader);
         int version = headerUtils.getVersion(acceptHeader);
 
-        if(headerUtils.isValidHeader(vnd, vndType)) {
+        if(headerUtils.isValidHeader(vndType)) {
             Object updatedEmployee = employeeService.updatePartialEmployee(id, partialEmployee, version);
 
             if (updatedEmployee != null) {
