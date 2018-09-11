@@ -2,9 +2,9 @@ package employee.utility;
 
 public class HttpRequestUtil {
 
-    private boolean isValidVendor(String vendor) {
-        return vendor.equals("vnd.pl.employee") ? true : false;
-    }
+//    private boolean isValidVendor(String vendor) {
+//        return vendor.equals("vnd.pl.employee") ? true : false;
+//    }
 
     private boolean isValidVendorType(String vndType) {
         return vndType.equals("json") ? true : false;
@@ -34,12 +34,12 @@ public class HttpRequestUtil {
     public boolean isValidHeader(String vnd, String vndType) {
         boolean isValid = false;
 
-        if(isValidVendor(vnd)) {
+//        if(isValidVendor(vnd)) {
 
             if(isValidVendorType(vndType)) {
                 return true;
             }
-        }
+//        }
 
         return isValid;
     }
@@ -54,4 +54,6 @@ public class HttpRequestUtil {
 
         return isSpecified;
     }
+
+
 }
