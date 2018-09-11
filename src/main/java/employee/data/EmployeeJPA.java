@@ -29,12 +29,23 @@ public class EmployeeJPA {
     @Column(name="datasource")
     private String datasource;
 
+    @Column(name = "company_id")
+    private Long companyId;
+
     public Long getEmployeeId() {
         return employeeId;
     }
 
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
+    }
+
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
     }
 
     public String getFirstName() {
@@ -131,6 +142,8 @@ public class EmployeeJPA {
         sb.append(employmentStatus);
         sb.append(", datasource: ");
         sb.append(datasource);
+        sb.append(", companyId: ");
+        sb.append(companyId);
         sb.append("]");
         return sb.toString();
     }
