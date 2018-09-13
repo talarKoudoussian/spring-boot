@@ -85,6 +85,7 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/companies/{id}", method = RequestMethod.PUT, produces = "application/vnd.pl.company+json", consumes = "application/json")
     public ResponseEntity<? extends Object> updateCompany(@PathVariable String id, @RequestBody CompanyJPA company, HttpServletRequest request){
