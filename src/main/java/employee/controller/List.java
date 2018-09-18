@@ -17,6 +17,7 @@ public class List {
 
     HttpRequestUtil headerUtils = new HttpRequestUtil();
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/companies/{id}/employees", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json")
     public ResponseEntity<java.util.List<? extends  Object>> getAllEmployees(@PathVariable("id") String companyId, HttpServletRequest request) {

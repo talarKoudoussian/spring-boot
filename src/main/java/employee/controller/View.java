@@ -17,6 +17,7 @@ public class View {
 
     HttpRequestUtil headerUtils = new HttpRequestUtil();
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/companies/{cid}/employees/{id}", method = RequestMethod.GET, produces = "application/vnd.pl.employee+json")
     public ResponseEntity<? extends  Object> getEmployee(@PathVariable("cid") String companyId, @PathVariable("id") String employeeId, HttpServletRequest request) {

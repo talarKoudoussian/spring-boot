@@ -23,6 +23,7 @@ public class CompanyController {
 
     HttpRequestUtil headerUtils = new HttpRequestUtil();
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/companies", method = RequestMethod.GET, produces = "application/vnd.pl.company+json")
     public ResponseEntity<List<? extends  Object>> getAllCompanies(HttpServletRequest request) {
@@ -46,6 +47,7 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/companies/{id}", method = RequestMethod.GET, produces = "application/vnd.pl.company+json")
     public ResponseEntity<? extends Object> getCompany(@PathVariable String id, HttpServletRequest request){
@@ -66,6 +68,7 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "/companies", method = RequestMethod.POST, produces = "application/vnd.pl.company+json", consumes = "application/json")
     public ResponseEntity<? extends Object> addCompany(@RequestBody CompanyJPA company, HttpServletRequest request){
@@ -107,6 +110,7 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @ResponseBody
     @RequestMapping(value = "companies/{id}", method = RequestMethod.PATCH, produces = "application/vnd.pl.company+json", consumes = "application/json")
     public ResponseEntity<? extends Object> updatePartialCompany(@PathVariable String id, @RequestBody CompanyJPA company, HttpServletRequest request) {
@@ -128,6 +132,7 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/companies/{id}", method = RequestMethod.DELETE, produces = "application/vnd.pl.company+json")
     public ResponseEntity<? extends Object> deleteCompany(@PathVariable String id, HttpServletRequest request) {
         String acceptHeader = request.getHeader("Accept");
