@@ -2,10 +2,12 @@ package company.service;
 
 import company.data.CompanyJPA;
 import company.repository.CompanyJPARepository;
+import employee.service.EmployeeService;
 import employee.utility.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Autowired
     CompanyJPARepository companyJPARepository;
+
+    @Autowired
+    EmployeeService employeeService;
 
     @Override
     public List<Object> getAllCompanies(int version) {
@@ -139,20 +144,21 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    @Transactional
     public boolean deleteCompany(String id, int version) {
         boolean isCompanyDeleted = false;
 
         switch (version) {
             case 1:
             default:
-                isCompanyDeleted = deleteCompanyJPA(id);
+                isCompanyDeleted = deleteCompanyJPA(id, version);
                 break;
         }
 
         return  isCompanyDeleted;
     }
 
-    private boolean deleteCompanyJPA(String id) {
+    private boolean deleteCompanyJPA(String id, int version) {
         boolean isCompanyDeleted = false;
 
         if(id.matches("\\d+")) {
@@ -160,6 +166,7 @@ public class CompanyServiceImpl implements CompanyService {
             boolean isExistingCompany = companyJPARepository.existsById(compId);
 
             if(isExistingCompany) {
+                employeeService.deleteEmployeesByCompanyId(id, version);
                 companyJPARepository.deleteById(compId);
                 isCompanyDeleted = true;
             }

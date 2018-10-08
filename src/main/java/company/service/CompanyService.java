@@ -9,6 +9,6 @@ public interface CompanyService {
     public Object getCompany(String id, int version);
     public Object addCompany(CompanyJPA company, int version);
     public Object updateCompany(String id, CompanyJPA company, int version);
-    public boolean deleteCompany(String id, int version);
+    boolean deleteCompany(String id, int version);
     public Object updatePartialCompany(String id, CompanyJPA company, int version);
 }
