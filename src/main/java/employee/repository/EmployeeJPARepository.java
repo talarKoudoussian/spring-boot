@@ -17,4 +17,7 @@ public interface EmployeeJPARepository extends CrudRepository<EmployeeJPA, Long>
 
     @Query(value = "SELECT * FROM employee WHERE company_id = :company_id AND employee_id = :employee_id", nativeQuery = true)
     Optional<EmployeeJPA> getEmployee(@Param("company_id") Long companyId, @Param("employee_id") Long employeeId);
+
+    @Query(value = "DELETE FROM employee WHERE company_id = :company_id", nativeQuery = true)
+    void deleteByCompanyId(@Param("company_id") Long compId);
 }

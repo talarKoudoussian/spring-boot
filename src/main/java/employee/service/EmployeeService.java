@@ -9,6 +9,7 @@ public interface EmployeeService {
     Object getEmployee(String companyId, String employeeId, int version);
     Object addEmployee(String companyId, EmployeeJPA employee, int version);
     Object deleteEmployee(String companyId, String employeeId, int version);
+    boolean deleteEmployeesByCompanyId(String id, int version);
     Object updateEmployee(String companyId, String employeeId, EmployeeJPA employee, int version);
     Object updatePartialEmployee(String companyId, String employeeId, EmployeeJPA employee, int version);
 }

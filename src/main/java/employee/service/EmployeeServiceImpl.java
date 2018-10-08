@@ -139,6 +139,31 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public boolean deleteEmployeesByCompanyId(String id, int version) {
+        boolean isDeleted = false;
+
+        switch (version) {
+            case 1:
+            default:
+                isDeleted = deleteEmployeesJPAByCompanyId(id);
+        }
+
+        return isDeleted;
+    }
+
+    private boolean deleteEmployeesJPAByCompanyId(String id) {
+        boolean isDeleted = false;
+
+        if(id.matches("\\d+")) {
+            Long compId = Long.valueOf(id);
+            employeeJPARepository.deleteByCompanyId(compId);
+            isDeleted = true;
+        }
+
+        return isDeleted;
+    }
+
+    @Override
     public Object updatePartialEmployee(String companyId, String employeeId, EmployeeJPA partialEmployeeJPA, int version) {
         Object updatedEmployee = null;
 
@@ -157,6 +182,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return updatedEmployee;
     }
+
+
 
     private List<EmployeeMongo> getAllEmployeesMongo() {
         List<EmployeeMongo> employees = employeeMongoRepository.findAll();
