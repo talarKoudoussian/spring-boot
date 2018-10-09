@@ -5,11 +5,11 @@ import employee.data.EmployeeJPA;
 import java.util.List;
 
 public interface EmployeeService {
-
-    public Object getEmployee(String id, int version);
-    public Object addEmployee(EmployeeJPA employee, int version);
-    public Object updateEmployee(String id, EmployeeJPA employee, int version);
-    public Object deleteEmployee(String id, int version);
-    public Object updatePartialEmployee(String id, EmployeeJPA employee, int version);
-    public List<Object> getAllEmployees(int version);
+    List<Object> getAllEmployees(String companyId, int version);
+    Object getEmployee(String companyId, String employeeId, int version);
+    Object addEmployee(String companyId, EmployeeJPA employee, int version);
+    Object deleteEmployee(String companyId, String employeeId, int version);
+    boolean deleteEmployeesByCompanyId(String id, int version);
+    Object updateEmployee(String companyId, String employeeId, EmployeeJPA employee, int version);
+    Object updatePartialEmployee(String companyId, String employeeId, EmployeeJPA employee, int version);
 }

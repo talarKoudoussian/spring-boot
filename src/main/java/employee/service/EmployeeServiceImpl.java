@@ -5,6 +5,7 @@ import employee.data.EmployeeMongo;
 import employee.repository.EmployeeJPARepository;
 import employee.repository.EmployeeMongoRepository;
 import employee.utility.Date;
+import employee.utility.Pojo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,18 +22,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     EmployeeMongoRepository employeeMongoRepository;
 
+    Pojo pojoUtil;
+
     @Override
-    public Object getEmployee(String id, int version) {
+    public Object getEmployee(String companyId, String employeeId, int version) {
         Object returnEmployee = null;
 
         switch (version) {
             case 1: {
-                returnEmployee = getEmployeeJPA(id);
+                returnEmployee = getEmployeeJPA(companyId, employeeId);
                 break;
             }
             case 2:
             default: {
-                returnEmployee = getEmployeeMongo(id);
+                returnEmployee = getEmployeeMongo(employeeId);
                 break;
             }
         }
@@ -41,12 +44,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Object> getAllEmployees(int version) {
+    public List<Object> getAllEmployees(String companyId, int version) {
         List<Object> employeesList = new ArrayList<>();
 
         switch (version) {
             case 1: {
-                List<EmployeeJPA> employeesJPA = getAllEmployeesJPA();
+                Iterable<EmployeeJPA> employeesJPA = getEmployeesJPA(companyId);
                 for (EmployeeJPA employee: employeesJPA) {
                     employeesList.add(employee);
                 }
@@ -65,19 +68,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeesList;
     }
 
+    private Iterable<EmployeeJPA> getEmployeesJPA(String companyId) {
+        Iterable<EmployeeJPA> employees = null;
+
+        if(companyId.matches("\\d+")) {
+            Long cid = Long.valueOf(companyId);
+            employees = employeeJPARepository.getEmployees(cid);
+        }
+
+        return employees;
+    }
+
     @Override
-    public Object addEmployee(EmployeeJPA employeeJPA, int version) {
+    public Object addEmployee(String companyId, EmployeeJPA employeeJPA, int version) {
         Object addedEmployee = null;
 
         switch (version) {
             case 1: {
-                addedEmployee = addEmployeeJPA(employeeJPA);
+                addedEmployee = addEmployeeJPA(companyId, employeeJPA);
                 break;
             }
 
             case 2:
             default: {
-                EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
+                EmployeeMongo employeeMongo = pojoUtil.toEmployeeMongo(employeeJPA);
                 addedEmployee = addEmployeeMongo(employeeMongo);
                 break;
             }
@@ -87,17 +101,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Object updateEmployee(String id, EmployeeJPA employee, int version) {
+    public Object updateEmployee(String companyId, String employeeId, EmployeeJPA employee, int version) {
         Object updatedEmployee = null;
 
         switch (version) {
             case 1: {
-                updatedEmployee = updateEmployeeJPA(id, employee);
+                updatedEmployee = updateEmployeeJPA(companyId, employeeId, employee);
                 break;
             }
             case 2:
             default: {
-                updatedEmployee = updateEmployeeMongo(id, employee);
+                updatedEmployee = updateEmployeeMongo(employeeId, employee);
                 break;
             }
         }
@@ -106,17 +120,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Object deleteEmployee(String id, int version) {
+    public Object deleteEmployee(String companyId, String employeeId, int version) {
         Object deletedEmployee = null;
 
         switch (version) {
             case 1: {
-                deletedEmployee = deleteEmployeeJPA(id);
+                deletedEmployee = deleteEmployeeJPA(companyId, employeeId);
                 break;
             }
             case 2:
             default: {
-                deletedEmployee = deleteEmployeeMongo(id);
+                deletedEmployee = deleteEmployeeMongo(employeeId);
                 break;
             }
         }
@@ -125,18 +139,43 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Object updatePartialEmployee(String id, EmployeeJPA partialEmployeeJPA, int version) {
+    public boolean deleteEmployeesByCompanyId(String id, int version) {
+        boolean isDeleted = false;
+
+        switch (version) {
+            case 1:
+            default:
+                isDeleted = deleteEmployeesJPAByCompanyId(id);
+        }
+
+        return isDeleted;
+    }
+
+    private boolean deleteEmployeesJPAByCompanyId(String id) {
+        boolean isDeleted = false;
+
+        if(id.matches("\\d+")) {
+            Long compId = Long.valueOf(id);
+            employeeJPARepository.deleteByCompanyId(compId);
+            isDeleted = true;
+        }
+
+        return isDeleted;
+    }
+
+    @Override
+    public Object updatePartialEmployee(String companyId, String employeeId, EmployeeJPA partialEmployeeJPA, int version) {
         Object updatedEmployee = null;
 
         switch (version) {
             case 1: {
-                updatedEmployee = updatePartialEmployeeJPA(id, partialEmployeeJPA);
+                updatedEmployee = updatePartialEmployeeJPA(companyId, employeeId, partialEmployeeJPA);
                 break;
             }
             case 2:
             default: {
-                EmployeeMongo partialEmployeeMongo = toEmployeeMongo(partialEmployeeJPA);
-                updatedEmployee = updatePartialEmployeeMongo(id, partialEmployeeMongo);
+                EmployeeMongo partialEmployeeMongo = pojoUtil.toEmployeeMongo(partialEmployeeJPA);
+                updatedEmployee = updatePartialEmployeeMongo(employeeId, partialEmployeeMongo);
                 break;
             }
         }
@@ -144,26 +183,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         return updatedEmployee;
     }
 
-    private List<EmployeeJPA> getAllEmployeesJPA() {
-        List<EmployeeJPA> employees =  new ArrayList<>();
 
-        Iterable<EmployeeJPA> allEmployees = employeeJPARepository.findAll();
-        allEmployees.forEach(employees::add);
-
-        return employees;
-    }
 
     private List<EmployeeMongo> getAllEmployeesMongo() {
         List<EmployeeMongo> employees = employeeMongoRepository.findAll();
         return employees;
     }
 
-    private EmployeeJPA updatePartialEmployeeJPA(String id, EmployeeJPA partialEmployeeJPA) {
+    private EmployeeJPA updatePartialEmployeeJPA(String companyId, String employeeId, EmployeeJPA partialEmployeeJPA) {
         EmployeeJPA updatedEmployee = null;
 
-        if (id.matches("\\d+")) {
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
+        if (employeeId.matches("\\d+")) {
+            Long empId = Long.valueOf(employeeId);
+            Long cid = Long.valueOf(companyId);
+            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.getEmployee(cid, empId);
 
             if (employeeOpt.isPresent()) {
                 EmployeeJPA selectedEmployee = employeeOpt.get();
@@ -215,12 +248,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         return updatedEmployee;
     }
 
-    private EmployeeJPA getEmployeeJPA(String id) {
+    private EmployeeJPA getEmployeeJPA(String companyId, String employeeId) {
         EmployeeJPA selectedEmployee = null;
 
-        if (id.matches("\\d+")) {
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
+        if (employeeId.matches("\\d+")) {
+            Long empId = Long.valueOf(employeeId);
+            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.getEmployee(Long.valueOf(companyId), empId);
 
             if (employeeOpt.isPresent()) {
                 selectedEmployee = employeeOpt.get();
@@ -259,12 +292,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return deletedEmployee;
     }
 
-    private EmployeeJPA deleteEmployeeJPA(String id) {
+    private EmployeeJPA deleteEmployeeJPA(String companyId, String employeeId) {
         EmployeeJPA deletedEmployee = null;
 
-        if(id.matches("\\d+")){
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
+        if(employeeId.matches("\\d+")){
+            Long empId = Long.valueOf(employeeId);
+            Long cid = Long.valueOf(companyId);
+            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.getEmployee(cid, empId);
 
             if(employeeOpt.isPresent()) {
                 employeeJPARepository.deleteById(empId);
@@ -275,12 +309,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return deletedEmployee;
     }
 
-    private EmployeeJPA updateEmployeeJPA(String id, EmployeeJPA employeeJPA) {
+    private EmployeeJPA updateEmployeeJPA(String companyId, String employeeId, EmployeeJPA employeeJPA) {
         EmployeeJPA updatedEmployee = null;
 
-        if (id.matches("\\d+")) {
-            Long empId = Long.valueOf(id);
-            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.findById(empId);
+        if (employeeId.matches("\\d+")) {
+            Long empId = Long.valueOf(employeeId);
+            Long cid = Long.valueOf(companyId);
+            Optional<EmployeeJPA> employeeOpt = employeeJPARepository.getEmployee(cid, empId);
 
             if (employeeOpt.isPresent()) {
 
@@ -289,6 +324,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     emp.setFirstName(employeeJPA.getFirstName());
                     emp.setLastName(employeeJPA.getLastName());
                     emp.setEmploymentStatus(employeeJPA.getEmploymentStatus());
+                    emp.setCompanyId(employeeJPA.getCompanyId());
                     updatedEmployee = employeeJPARepository.save(emp);
                 }
             }
@@ -298,7 +334,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private EmployeeMongo updateEmployeeMongo(String id, EmployeeJPA employeeJPA) {
-        EmployeeMongo employeeMongo = toEmployeeMongo(employeeJPA);
+        EmployeeMongo employeeMongo = pojoUtil.toEmployeeMongo(employeeJPA);
         EmployeeMongo updatedEmployee = null;
 
         if (id.matches("^[a-zA-Z0-9_.-]*$")) {
@@ -319,10 +355,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return updatedEmployee;
     }
 
-    private EmployeeJPA addEmployeeJPA(EmployeeJPA employeeJPA) {
+    private EmployeeJPA addEmployeeJPA(String companyId, EmployeeJPA employeeJPA) {
         String dateNow = new Date().dateNowToIso();
         employeeJPA.setAddedDate(dateNow);
         employeeJPA.setDatasource("MariaDB");
+        employeeJPA.setCompanyId(Long.valueOf(companyId));
 
         EmployeeJPA addedEmployee = null;
 
@@ -345,16 +382,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return addedEmployee;
-    }
-
-    private EmployeeMongo toEmployeeMongo(EmployeeJPA employeeJPA) {
-        EmployeeMongo employeeMongo = new EmployeeMongo();
-        employeeMongo.setFirstName(employeeJPA.getFirstName());
-        employeeMongo.setLastName(employeeJPA.getLastName());
-        employeeMongo.setAddedDate(employeeJPA.getAddedDate());
-        employeeMongo.setEmploymentStatus(employeeJPA.getEmploymentStatus());
-        employeeMongo.setDatasource(employeeJPA.getDatasource());
-
-        return employeeMongo;
     }
 }
