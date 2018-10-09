@@ -324,7 +324,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     emp.setFirstName(employeeJPA.getFirstName());
                     emp.setLastName(employeeJPA.getLastName());
                     emp.setEmploymentStatus(employeeJPA.getEmploymentStatus());
-                    emp.setCompanyId(cid);
+                    emp.setCompanyId(employeeJPA.getCompanyId());
                     updatedEmployee = employeeJPARepository.save(emp);
                 }
             }
